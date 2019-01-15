@@ -30,11 +30,25 @@ void Controller::newResource() const
     m_model->newResource();
 }
 
+void Controller::openResources(const QList<QFileInfo> & files) const
+{
+    QSet<QString> paths;
+    for(auto file : files) {
+        if(file.exists() && file.isFile()) {
+            paths.insert(file.absoluteFilePath());
+        }
+    }
+    for(auto filePath : paths) {
+        this->openResource(filePath);
+    }
+}
+
 void Controller::openResource(const QString & file) const
 {
     m_model->closeResource();
     m_model->openResource(file);
 }
+
 void Controller::saveResource() const
 {
     m_model->saveResource();

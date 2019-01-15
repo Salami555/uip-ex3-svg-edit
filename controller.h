@@ -1,6 +1,8 @@
 #pragma once
 
 #include <QObject>
+#include <QList>
+#include <QFileInfo>
 
 class Model;
 
@@ -19,6 +21,7 @@ signals:
 
 public slots:
     void newResource() const;
+    void openResources(const QList<QFileInfo> & files) const;
     void openResource(const QString & file) const;
     void saveResource() const;
     void closeResource() const;

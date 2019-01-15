@@ -95,27 +95,6 @@ const Controller * MainWindow::controller() const
 }
 
 
-void MainWindow::showEvent(QShowEvent * event) {
-    QMainWindow::showEvent(event);
-    QStringList args = qApp->arguments();
-    for(short i = 1; i < args.size(); i++) {
-        QFileInfo file(args[i]);
-        this->fileOpenedWith_handling(file);
-    }
-}
-
-void MainWindow::fileOpenedWith_handling(QFileInfo file) {
-    if(file.exists() && file.isFile()) {
-        this->controller()->openResource(file.absoluteFilePath());
-    }
-}
-
-void MainWindow::closeEvent(QCloseEvent * event)
-{
-    m_ui->actionExit->trigger();
-    Q_UNUSED(event);
-}
-
 void MainWindow::dragEnterEvent(QDragEnterEvent *event) {
     if (event->mimeData()->hasUrls())
         event->acceptProposedAction();
@@ -124,10 +103,28 @@ void MainWindow::dragEnterEvent(QDragEnterEvent *event) {
 void MainWindow::dropEvent(QDropEvent * event) {
     const QMimeData* mimeData = event->mimeData();
     if (mimeData->hasUrls()) {
+        QList<QFileInfo> files;
         for(QUrl url : mimeData->urls()) {
-            this->fileOpenedWith_handling(QFileInfo(url.toLocalFile()));
+            files.append(QFileInfo(url.toLocalFile()));
         }
+        this->controller()->openResources(files);
     }
+}
+
+void MainWindow::showEvent(QShowEvent * event) {
+    QMainWindow::showEvent(event);
+    QStringList args = qApp->arguments();
+    QList<QFileInfo> files;
+    for(short i = 1; i < args.size(); i++) {
+        files.append(QFileInfo(args[i]));
+    }
+    this->controller()->openResources(files);
+}
+
+void MainWindow::closeEvent(QCloseEvent * event)
+{
+    m_ui->actionExit->trigger();
+    Q_UNUSED(event);
 }
 
 void MainWindow::onResourceOpenend()
