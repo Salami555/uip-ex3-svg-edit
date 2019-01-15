@@ -48,6 +48,7 @@ public:
     QString source() const;
 
     QGraphicsSvgItem * graphicsItem();
+    QFileInfo fileInfo() const;
 
 protected:
     bool validate() const;

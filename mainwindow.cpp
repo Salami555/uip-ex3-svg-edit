@@ -93,6 +93,21 @@ const Controller * MainWindow::controller() const
 }
 
 
+void MainWindow::showEvent(QShowEvent * event) {
+    QMainWindow::showEvent(event);
+    QList<QString> args = qApp->arguments();
+    for(short i = 1; i < args.size(); i++) {
+        QFileInfo file(args[i]);
+        this->fileOpenedWith_handling(file);
+    }
+}
+
+void MainWindow::fileOpenedWith_handling(QFileInfo file) {
+    if(file.exists() && file.isFile()) {
+        this->controller()->openResource(file.absoluteFilePath());
+    }
+}
+
 void MainWindow::closeEvent(QCloseEvent * event)
 {
     m_ui->actionExit->trigger();

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QMainWindow>
-#include <QScopedPointer>
+#include <QFileInfo>
 
 class Controller;
 class Model;
@@ -35,6 +35,9 @@ protected:
     void initializeGraphicsView();
     void initializeSourceView();
 
+    void fileOpenedWith_handling(QFileInfo file);
+
+    virtual void showEvent(QShowEvent * event);
     virtual void closeEvent(QCloseEvent * event);
 
 private slots:

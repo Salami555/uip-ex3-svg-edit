@@ -120,3 +120,8 @@ QGraphicsSvgItem * Resource::graphicsItem()
     m_graphicsItem.reset(new QGraphicsSvgItem(m_tempFile->fileName()));
     return m_graphicsItem.get();
 }
+
+QFileInfo Resource::fileInfo() const
+{
+    return m_fileInfo;
+}
