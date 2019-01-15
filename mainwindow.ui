@@ -10,6 +10,9 @@
     <height>600</height>
    </rect>
   </property>
+  <property name="acceptDrops">
+   <bool>true</bool>
+  </property>
   <property name="windowTitle">
    <string>SVG Edit</string>
   </property>
@@ -24,7 +27,7 @@
     </sizepolicy>
    </property>
    <property name="acceptDrops">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
@@ -61,13 +64,13 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
-    <addaction name="actionNewFile"/>
-    <addaction name="actionOpenFile"/>
     <widget class="QMenu" name="menu_RecentlyUsedFiles">
      <property name="title">
       <string>&amp;Recently Used</string>
      </property>
     </widget>
+    <addaction name="actionNewFile"/>
+    <addaction name="actionOpenFile"/>
     <addaction name="menu_RecentlyUsedFiles"/>
     <addaction name="separator"/>
     <addaction name="actionSaveFile"/>

@@ -6,6 +6,8 @@
 #include <QSplitter>
 #include <QFileDialog>
 #include <QErrorMessage>
+#include <QDropEvent>
+#include <QMimeData>
 #include <QMessageBox>
 
 #include "model.h"
@@ -95,7 +97,7 @@ const Controller * MainWindow::controller() const
 
 void MainWindow::showEvent(QShowEvent * event) {
     QMainWindow::showEvent(event);
-    QList<QString> args = qApp->arguments();
+    QStringList args = qApp->arguments();
     for(short i = 1; i < args.size(); i++) {
         QFileInfo file(args[i]);
         this->fileOpenedWith_handling(file);
@@ -114,6 +116,19 @@ void MainWindow::closeEvent(QCloseEvent * event)
     Q_UNUSED(event);
 }
 
+void MainWindow::dragEnterEvent(QDragEnterEvent *event) {
+    if (event->mimeData()->hasUrls())
+        event->acceptProposedAction();
+}
+
+void MainWindow::dropEvent(QDropEvent * event) {
+    const QMimeData* mimeData = event->mimeData();
+    if (mimeData->hasUrls()) {
+        for(QUrl url : mimeData->urls()) {
+            this->fileOpenedWith_handling(QFileInfo(url.toLocalFile()));
+        }
+    }
+}
 
 void MainWindow::onResourceOpenend()
 {

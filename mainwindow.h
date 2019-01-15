@@ -40,6 +40,9 @@ protected:
     virtual void showEvent(QShowEvent * event);
     virtual void closeEvent(QCloseEvent * event);
 
+    virtual void dragEnterEvent(QDragEnterEvent * event);
+    virtual void dropEvent(QDropEvent * event);
+
 private slots:
     void onResourceOpenend();
     void onResourceClosed();
