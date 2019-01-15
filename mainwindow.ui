@@ -6,33 +6,55 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>673</width>
-    <height>389</height>
+    <width>800</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>SVG Edit</string>
   </property>
+  <property name="dockOptions">
+   <set>QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks</set>
+  </property>
   <widget class="QWidget" name="centralWidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="acceptDrops">
+    <bool>true</bool>
+   </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="QSplitter" name="splitter">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
+     <widget class="QTabWidget" name="tabView">
+      <property name="currentIndex">
+       <number>0</number>
       </property>
-      <widget class="SourceView" name="sourceView" native="true"/>
-      <widget class="GraphicsView" name="graphicsView" native="true"/>
+      <widget class="QWidget" name="welcome">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <attribute name="title">
+        <string>Welcome</string>
+       </attribute>
+      </widget>
      </widget>
     </item>
    </layout>
   </widget>
+  <widget class="QStatusBar" name="statusBar"/>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>673</width>
-     <height>21</height>
+     <width>800</width>
+     <height>17</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -41,93 +63,85 @@
     </property>
     <addaction name="actionNewFile"/>
     <addaction name="actionOpenFile"/>
-    <addaction name="separator"/>
-    <addaction name="actionCloseFile"/>
+    <widget class="QMenu" name="menu_RecentlyUsedFiles">
+     <property name="title">
+      <string>&amp;Recently Used</string>
+     </property>
+    </widget>
+    <addaction name="menu_RecentlyUsedFiles"/>
     <addaction name="separator"/>
     <addaction name="actionSaveFile"/>
     <addaction name="actionSaveFileAs"/>
+    <addaction name="actionSaveAllFiles"/>
+    <addaction name="separator"/>
+    <addaction name="actionCloseFile"/>
+    <addaction name="actionCloseAllFiles"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
-   <widget class="QMenu" name="menuEdit">
+   <widget class="QMenu" name="menu_Edit">
     <property name="title">
      <string>&amp;Edit</string>
     </property>
     <addaction name="actionUndo"/>
     <addaction name="actionRedo"/>
     <addaction name="separator"/>
+    <addaction name="actionCut"/>
+    <addaction name="actionCopy"/>
+    <addaction name="actionPaste"/>
     <addaction name="actionSelectAll"/>
+    <addaction name="separator"/>
+    <addaction name="actionFind"/>
+    <addaction name="actionReplace"/>
+    <addaction name="actionGoto"/>
    </widget>
-   <widget class="QMenu" name="menuView">
+   <widget class="QMenu" name="menu_View">
     <property name="title">
      <string>&amp;View</string>
     </property>
-    <addaction name="actionSwapViews"/>
-    <addaction name="separator"/>
-    <addaction name="actionViewSource"/>
-    <addaction name="actionViewGraphic"/>
-    <addaction name="separator"/>
-    <addaction name="actionColumns1"/>
-    <addaction name="actionColumns2"/>
-    <addaction name="actionColumns3"/>
+    <widget class="QMenu" name="menu_SourceView">
+     <property name="title">
+      <string>&amp;Source</string>
+     </property>
+     <addaction name="actionChangeFontSize"/>
+     <addaction name="actionToggleSyntaxHighlighting"/>
+     <addaction name="actionToggleLineWrap"/>
+     <addaction name="separator"/>
+     <addaction name="actionSourceViewToLeftSide"/>
+     <addaction name="actionSourceViewToRightSide"/>
+    </widget>
+    <widget class="QMenu" name="menu_GraphicView">
+     <property name="title">
+      <string>&amp;Graphic</string>
+     </property>
+     <addaction name="separator"/>
+     <addaction name="actionZoomIn"/>
+     <addaction name="actionZoomOut"/>
+     <addaction name="actionZoomFitSize"/>
+     <addaction name="separator"/>
+     <addaction name="actionGraphicViewToLeftSide"/>
+     <addaction name="actionGraphicViewToRightSide"/>
+    </widget>
+    <addaction name="menu_SourceView"/>
+    <addaction name="menu_GraphicView"/>
+   </widget>
+   <widget class="QMenu" name="menu_Help">
+    <property name="title">
+     <string>&amp;?</string>
+    </property>
+    <addaction name="actionAbout"/>
    </widget>
    <addaction name="menu_File"/>
-   <addaction name="menuEdit"/>
-   <addaction name="menuView"/>
+   <addaction name="menu_Edit"/>
+   <addaction name="menu_View"/>
+   <addaction name="menu_Help"/>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
-  <widget class="QToolBar" name="toolBarView">
-   <property name="windowTitle">
-    <string>toolBar_2</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionSwapViews"/>
-   <addaction name="separator"/>
-   <addaction name="actionViewSource"/>
-   <addaction name="actionViewGraphic"/>
-   <addaction name="separator"/>
-   <addaction name="actionColumns1"/>
-   <addaction name="actionColumns2"/>
-   <addaction name="actionColumns3"/>
-  </widget>
-  <widget class="QToolBar" name="toolBar">
-   <property name="windowTitle">
-    <string>toolBar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionNewFile"/>
-   <addaction name="actionOpenFile"/>
-   <addaction name="actionSaveFile"/>
-   <addaction name="separator"/>
-   <addaction name="actionSyntaxHighlighting"/>
-   <addaction name="actionWordWrap"/>
-   <addaction name="actionSelectAll"/>
-   <addaction name="separator"/>
-   <addaction name="actionZoomIn"/>
-   <addaction name="actionZoomOut"/>
-   <addaction name="actionFitView"/>
-  </widget>
-  <action name="actionOpenTest">
-   <property name="text">
-    <string>Open &amp;Test</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+N</string>
-   </property>
-  </action>
   <action name="actionExit">
    <property name="text">
     <string>E&amp;xit</string>
+   </property>
+   <property name="toolTip">
+    <string>Exit application</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
@@ -140,42 +154,36 @@
    <property name="enabled">
     <bool>true</bool>
    </property>
-   <property name="icon">
-    <iconset resource="material-icons.qrc">
-     <normaloff>:/material/material/baseline-add-24px.svg</normaloff>:/material/material/baseline-add-24px.svg</iconset>
-   </property>
    <property name="text">
-    <string>&amp;New File</string>
+    <string>&amp;New</string>
+   </property>
+   <property name="toolTip">
+    <string>New file</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
    </property>
   </action>
   <action name="actionOpenFile">
-   <property name="icon">
-    <iconset resource="material-icons.qrc">
-     <normaloff>:/material/material/baseline-open_alt-24px.svg</normaloff>:/material/material/baseline-open_alt-24px.svg</iconset>
-   </property>
    <property name="text">
-    <string>&amp;Open File</string>
+    <string>&amp;Open</string>
    </property>
-  </action>
-  <action name="actionCloseFile">
-   <property name="enabled">
-    <bool>true</bool>
+   <property name="toolTip">
+    <string>Open file</string>
    </property>
-   <property name="icon">
-    <iconset resource="material-icons.qrc">
-     <normaloff>:/material/material/baseline-clear-24px.svg</normaloff>:/material/material/baseline-clear-24px.svg</iconset>
-   </property>
-   <property name="text">
-    <string>&amp;Close File</string>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
   </action>
   <action name="actionSaveFile">
-   <property name="icon">
-    <iconset resource="material-icons.qrc">
-     <normaloff>:/material/material/baseline-save_alt-24px.svg</normaloff>:/material/material/baseline-save_alt-24px.svg</iconset>
-   </property>
    <property name="text">
-    <string>&amp;Save File</string>
+    <string>&amp;Save</string>
+   </property>
+   <property name="toolTip">
+    <string>Save file</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
   <action name="actionSaveFileAs">
@@ -183,16 +191,57 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Save File &amp;As</string>
+    <string>Save &amp;As...</string>
+   </property>
+   <property name="toolTip">
+    <string>Save file as...</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+Shift+S</string>
+   </property>
+  </action>
+  <action name="actionSaveAllFiles">
+   <property name="text">
+    <string>Sav&amp;e All</string>
+   </property>
+   <property name="toolTip">
+    <string>Save all files</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
+   </property>
+  </action>
+  <action name="actionCloseFile">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Close</string>
+   </property>
+   <property name="toolTip">
+    <string>Close current file</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
+   </property>
+  </action>
+  <action name="actionCloseAllFiles">
+   <property name="text">
+    <string>Clos&amp;e All</string>
+   </property>
+   <property name="toolTip">
+    <string>Close all files</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+W</string>
    </property>
   </action>
   <action name="actionUndo">
-   <property name="icon">
-    <iconset resource="material-icons.qrc">
-     <normaloff>:/material/material/baseline-undo-24px.svg</normaloff>:/material/material/baseline-undo-24px.svg</iconset>
-   </property>
    <property name="text">
     <string>&amp;Undo</string>
+   </property>
+   <property name="toolTip">
+    <string>Undo latest changes</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Z</string>
@@ -202,187 +251,201 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="icon">
-    <iconset resource="material-icons.qrc">
-     <normaloff>:/material/material/baseline-redo-24px.svg</normaloff>:/material/material/baseline-redo-24px.svg</iconset>
-   </property>
    <property name="text">
     <string>&amp;Redo</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+Z</string>
-   </property>
-  </action>
-  <action name="actionZoomIn">
-   <property name="icon">
-    <iconset resource="material-icons.qrc">
-     <normaloff>:/material/material/baseline-zoom_in-24px.svg</normaloff>:/material/material/baseline-zoom_in-24px.svg</iconset>
-   </property>
-   <property name="text">
-    <string>Zoom &amp;In</string>
+   <property name="toolTip">
+    <string>Redo latest changes</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl++</string>
+    <string>Ctrl+Y, Ctrl+Shift+Z</string>
    </property>
   </action>
-  <action name="actionZoomOut">
-   <property name="icon">
-    <iconset resource="material-icons.qrc">
-     <normaloff>:/material/material/baseline-zoom_out-24px.svg</normaloff>:/material/material/baseline-zoom_out-24px.svg</iconset>
-   </property>
+  <action name="actionCut">
    <property name="text">
-    <string>Zoom &amp;Out</string>
+    <string>Cu&amp;t</string>
+   </property>
+   <property name="toolTip">
+    <string>Cut selection to clipboard</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+-</string>
+    <string>Ctrl+X</string>
    </property>
   </action>
-  <action name="actionFitView">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="material-icons.qrc">
-     <normaloff>:/material/material/baseline-aspect_ratio-24px.svg</normaloff>:/material/material/baseline-aspect_ratio-24px.svg</iconset>
-   </property>
+  <action name="actionCopy">
    <property name="text">
-    <string>&amp;Fit to View</string>
+    <string>&amp;Copy</string>
    </property>
-  </action>
-  <action name="actionColumns2">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="material-icons.qrc">
-     <normaloff>:/material/material/baseline-view_column_2-24px.svg</normaloff>:/material/material/baseline-view_column_2-24px.svg</iconset>
-   </property>
-   <property name="text">
-    <string>&amp;Two Columns</string>
+   <property name="toolTip">
+    <string>Copy selection to clipboard</string>
    </property>
    <property name="shortcut">
-    <string>Alt+Shift+2</string>
+    <string>Ctrl+C</string>
    </property>
   </action>
-  <action name="actionColumns3">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="material-icons.qrc">
-     <normaloff>:/material/material/baseline-view_column_3-24px.svg</normaloff>:/material/material/baseline-view_column_3-24px.svg</iconset>
-   </property>
+  <action name="actionPaste">
    <property name="text">
-    <string>Th&amp;ree Columns</string>
+    <string>&amp;Paste</string>
+   </property>
+   <property name="toolTip">
+    <string>Paste from clipboard</string>
    </property>
    <property name="shortcut">
-    <string>Alt+Shift+3</string>
+    <string>Ctrl+V</string>
    </property>
   </action>
   <action name="actionSelectAll">
-   <property name="icon">
-    <iconset resource="material-icons.qrc">
-     <normaloff>:/material/material/baseline-select_all-24px.svg</normaloff>:/material/material/baseline-select_all-24px.svg</iconset>
-   </property>
    <property name="text">
     <string>Select &amp;All</string>
+   </property>
+   <property name="toolTip">
+    <string>Select all lines</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+A</string>
    </property>
   </action>
-  <action name="actionViewSource">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="material-icons.qrc">
-     <normaloff>:/material/material/baseline-code-24px.svg</normaloff>:/material/material/baseline-code-24px.svg</iconset>
-   </property>
+  <action name="actionFind">
    <property name="text">
-    <string>View &amp;Source</string>
+    <string>&amp;Find</string>
    </property>
-  </action>
-  <action name="actionViewGraphic">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="material-icons.qrc">
-     <normaloff>:/material/material/baseline-crop_original-24px.svg</normaloff>:/material/material/baseline-crop_original-24px.svg</iconset>
-   </property>
-   <property name="text">
-    <string>View &amp;Graphic</string>
-   </property>
-  </action>
-  <action name="actionColumns1">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="material-icons.qrc">
-     <normaloff>:/material/material/baseline-view_column_1-24px.svg</normaloff>:/material/material/baseline-view_column_1-24px.svg</iconset>
-   </property>
-   <property name="text">
-    <string>&amp;Single Column</string>
+   <property name="toolTip">
+    <string>Find text in file</string>
    </property>
    <property name="shortcut">
-    <string>Alt+Shift+1</string>
+    <string>Ctrl+F</string>
    </property>
   </action>
-  <action name="actionSwapViews">
-   <property name="icon">
-    <iconset resource="material-icons.qrc">
-     <normaloff>:/material/material/baseline-swap_horiz-24px.svg</normaloff>:/material/material/baseline-swap_horiz-24px.svg</iconset>
-   </property>
+  <action name="actionReplace">
    <property name="text">
-    <string>&amp;Swap Views</string>
+    <string>R&amp;eplace</string>
+   </property>
+   <property name="toolTip">
+    <string>Replace text in file</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+H</string>
    </property>
   </action>
-  <action name="actionSyntaxHighlighting">
+  <action name="actionGoto">
+   <property name="text">
+    <string>&amp;Go to Line</string>
+   </property>
+   <property name="toolTip">
+    <string>Move text cursor to line number</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+G</string>
+   </property>
+  </action>
+  <action name="actionZoomIn">
+   <property name="text">
+    <string>Zoom &amp;In</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom into the image</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+]</string>
+   </property>
+  </action>
+  <action name="actionZoomOut">
+   <property name="text">
+    <string>Zoom &amp;Out</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom out of the image</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+-</string>
+   </property>
+  </action>
+  <action name="actionZoomFitSize">
+   <property name="text">
+    <string>&amp;Fit Size</string>
+   </property>
+   <property name="toolTip">
+    <string>Fit image size into view</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+0</string>
+   </property>
+  </action>
+  <action name="actionChangeFontSize">
+   <property name="text">
+    <string>&amp;Font Size</string>
+   </property>
+   <property name="toolTip">
+    <string>Font size settings</string>
+   </property>
+  </action>
+  <action name="actionToggleLineWrap">
    <property name="checkable">
     <bool>true</bool>
    </property>
-   <property name="icon">
-    <iconset resource="material-icons.qrc">
-     <normaloff>:/material/material/baseline-format_strikethrough-24px.svg</normaloff>
-     <normalon>:/material/material/baseline-title-24px.svg</normalon>:/material/material/baseline-format_strikethrough-24px.svg</iconset>
+   <property name="text">
+    <string>Line &amp;Wrap</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle line wrap</string>
+   </property>
+  </action>
+  <action name="actionToggleSyntaxHighlighting">
+   <property name="checkable">
+    <bool>true</bool>
    </property>
    <property name="text">
     <string>Syntax &amp;Highlighting</string>
    </property>
+   <property name="toolTip">
+    <string>Toggle syntax highlighting</string>
+   </property>
   </action>
-  <action name="actionWordWrap">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="material-icons.qrc">
-     <normaloff>:/material/material/baseline-notes-24px.svg</normaloff>
-     <normalon>:/material/material/baseline-wrap_text-24px.svg</normalon>:/material/material/baseline-notes-24px.svg</iconset>
-   </property>
+  <action name="actionGraphicViewToLeftSide">
    <property name="text">
-    <string>Word &amp;Wrap</string>
+    <string>To &amp;Left Side</string>
+   </property>
+   <property name="toolTip">
+    <string>Move graphic view to left side</string>
+   </property>
+  </action>
+  <action name="actionGraphicViewToRightSide">
+   <property name="text">
+    <string>To &amp;Right Side</string>
+   </property>
+   <property name="toolTip">
+    <string>Move graphic view to right side</string>
+   </property>
+  </action>
+  <action name="actionSourceViewToLeftSide">
+   <property name="text">
+    <string>To &amp;Left Side</string>
+   </property>
+   <property name="toolTip">
+    <string>Move source view to left side</string>
+   </property>
+  </action>
+  <action name="actionSourceViewToRightSide">
+   <property name="text">
+    <string>To &amp;Right Side</string>
+   </property>
+   <property name="toolTip">
+    <string>Move source view to right side</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>&amp;About SVG-Edit</string>
+   </property>
+   <property name="toolTip">
+    <string>View the about box</string>
+   </property>
+   <property name="shortcut">
+    <string>F1</string>
    </property>
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <customwidgets>
-  <customwidget>
-   <class>GraphicsView</class>
-   <extends>QWidget</extends>
-   <header>graphicsview.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>SourceView</class>
-   <extends>QWidget</extends>
-   <header>sourceview.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
- <resources>
-  <include location="material-icons.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

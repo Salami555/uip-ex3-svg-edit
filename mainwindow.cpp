@@ -6,6 +6,7 @@
 #include <QSplitter>
 #include <QFileDialog>
 #include <QErrorMessage>
+#include <QMessageBox>
 
 #include "model.h"
 #include "resource.h"
@@ -22,16 +23,17 @@ MainWindow::MainWindow(QWidget * parent) :
     m_ui(new Ui::MainWindow)
 {
     m_ui->setupUi(this);
-    m_ui->graphicsView->setFitView(true);
-    m_ui->sourceView->setHighlighting(true);
-    m_ui->sourceView->setWordWrap(true);
+
+    //    m_ui->graphicsView->setFitView(true);
+    //    m_ui->sourceView->setHighlighting(true);
+    //    m_ui->sourceView->setWordWrap(true);
 
     // connect(m_ui->actionViewSource, SIGNAL(triggered()), this, SLOT(foobar1()));
     // connect(m_ui->actionViewSource, &QAction::triggered,[]() { qDebug() << "test mit lambda"; });
     // connect(m_ui->actionSelectAll, &QAction::triggered, m_ui->sourceView, &SourceView::selectAll);
 
-    connect(m_ui->actionSyntaxHighlighting, &QAction::triggered, m_ui->sourceView, &SourceView::setHighlighting);
-    connect(m_ui->actionWordWrap, &QAction::triggered, m_ui->sourceView, &SourceView::setWordWrap);
+    //    connect(m_ui->actionSyntaxHighlighting, &QAction::triggered, m_ui->sourceView, &SourceView::setHighlighting);
+    //    connect(m_ui->actionWordWrap, &QAction::triggered, m_ui->sourceView, &SourceView::setWordWrap);
 }
 
 MainWindow::~MainWindow()
@@ -100,19 +102,22 @@ void MainWindow::closeEvent(QCloseEvent * event)
 
 void MainWindow::onResourceOpenend()
 {
-    m_ui->sourceView->setResource(m_model->resource());
-    m_ui->graphicsView->setResource(m_model->resource());
+    auto alert = new QMessageBox(this);
+    alert->setText("opened resource: " + m_model->resource()->fileInfo().fileName());
+    alert->showNormal();
+    //    m_ui->sourceView->setResource(m_model->resource());
+    //    m_ui->graphicsView->setResource(m_model->resource());
 }
 
 void MainWindow::onResourceClosed()
 {
-    m_ui->sourceView->setResource(nullptr);
-    m_ui->graphicsView->setResource(nullptr);
+    //    m_ui->sourceView->setResource(nullptr);
+    //    m_ui->graphicsView->setResource(nullptr);
 }
 
 void MainWindow::onResourceModified()
 {
-    m_ui->graphicsView->reloadFromResource();
+    //    m_ui->graphicsView->reloadFromResource();
     //m_ui->graphicsView->setResource(m_model->resource());
 }
 
@@ -125,15 +130,15 @@ void MainWindow::onResourceOperationFailed(const ResourceOperationResult result)
 
 void MainWindow::on_actionSwapViews_triggered()
 {
-    const auto widget0 = m_ui->splitter->widget(0);
-    const auto widget1 = m_ui->splitter->widget(1);
+    //    const auto widget0 = m_ui->splitter->widget(0);
+    //    const auto widget1 = m_ui->splitter->widget(1);
 
-    const auto sizes = m_ui->splitter->sizes();
+    //    const auto sizes = m_ui->splitter->sizes();
 
-    m_ui->splitter->insertWidget(0, widget1);
-    m_ui->splitter->insertWidget(1, widget0);
+    //    m_ui->splitter->insertWidget(0, widget1);
+    //    m_ui->splitter->insertWidget(1, widget0);
 
-    m_ui->splitter->setSizes(sizes);
+    //    m_ui->splitter->setSizes(sizes);
 }
 
 void MainWindow::on_actionOpenFile_triggered()
@@ -151,42 +156,42 @@ void MainWindow::on_actionOpenFile_triggered()
 
 void MainWindow::on_actionFitView_toggled(bool enabled) const
 {
-    m_ui->graphicsView->setFitView(enabled);
+    //    m_ui->graphicsView->setFitView(enabled);
 }
 
 void MainWindow::on_graphicsView_fitViewChanged(bool enabled) const
 {
-    m_ui->actionFitView->blockSignals(true);
-    m_ui->actionFitView->setChecked(enabled);
-    m_ui->actionFitView->blockSignals(false);
+//    m_ui->actionFitView->blockSignals(true);
+//    m_ui->actionFitView->setChecked(enabled);
+//    m_ui->actionFitView->blockSignals(false);
 }
 
 void MainWindow::on_sourceView_highlightChanged(bool enabled) const
 {
-    m_ui->actionSyntaxHighlighting->blockSignals(true);
-    m_ui->actionSyntaxHighlighting->setChecked(enabled);
-    m_ui->actionSyntaxHighlighting->blockSignals(false);
+//    m_ui->actionSyntaxHighlighting->blockSignals(true);
+//    m_ui->actionSyntaxHighlighting->setChecked(enabled);
+//    m_ui->actionSyntaxHighlighting->blockSignals(false);
 }
 
 void MainWindow::on_sourceView_wordWrapChanged(bool enabled) const
 {
-    m_ui->actionWordWrap->blockSignals(true);
-    m_ui->actionWordWrap->setChecked(enabled);
-    m_ui->actionWordWrap->blockSignals(false);
+//    m_ui->actionWordWrap->blockSignals(true);
+//    m_ui->actionWordWrap->setChecked(enabled);
+//    m_ui->actionWordWrap->blockSignals(false);
 }
 
 void MainWindow::on_sourceView_sourceChanged() const
 {
-    const auto source = m_ui->sourceView->source();
-    m_controller->modifyResource(source);
+    //    const auto source = m_ui->sourceView->source();
+    //    m_controller->modifyResource(source);
 }
 
 void MainWindow::on_actionZoomIn_triggered()
 {
-    m_ui->graphicsView->setZoom(1.25);
+    //    m_ui->graphicsView->setZoom(1.25);
 }
 
 void MainWindow::on_actionZoomOut_triggered()
 {
-    m_ui->graphicsView->setZoom(1.0 / 1.25);
+    //    m_ui->graphicsView->setZoom(1.0 / 1.25);
 }
