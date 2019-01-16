@@ -6,13 +6,13 @@ class MainWindow;
 class Resource;
 enum class ResourceOperationResult;
 
-class Model : public QObject
+class TabModel : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit Model();
-    ~Model();
+    explicit TabModel();
+    ~TabModel();
 
     void newResource();
     void openResource(const QString & file);

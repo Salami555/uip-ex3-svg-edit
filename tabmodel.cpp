@@ -1,25 +1,25 @@
-#include "model.h"
+#include "tabmodel.h"
 
 #include "mainwindow.h"
 #include "resource.h"
 
 
-Model::Model() :
+TabModel::TabModel() :
     m_resource(nullptr)
 {
 }
 
-Model::~Model()
+TabModel::~TabModel()
 {
     assert(m_resource == nullptr);
 }
 
-const Resource * Model::resource() const
+const Resource * TabModel::resource() const
 {
     return m_resource;
 }
 
-void Model::newResource()
+void TabModel::newResource()
 {
     assert(m_resource == nullptr);
 
@@ -32,7 +32,7 @@ void Model::newResource()
     emit operationFailed(opResult);
 }
 
-void Model::openResource(const QString & file)
+void TabModel::openResource(const QString & file)
 {
     assert(m_resource == nullptr);
 
@@ -45,7 +45,7 @@ void Model::openResource(const QString & file)
     emit operationFailed(opResult);
 }
 
-void Model::saveResource()
+void TabModel::saveResource()
 {
     assert(m_resource != nullptr);
 
@@ -57,7 +57,7 @@ void Model::saveResource()
     emit operationFailed(opResult);
 }
 
-void Model::closeResource()
+void TabModel::closeResource()
 {
     if(m_resource == nullptr) {
         return;
@@ -68,7 +68,7 @@ void Model::closeResource()
     emit resourceClosed();
 }
 
-void Model::modifyResource(const QString & source)
+void TabModel::modifyResource(const QString & source)
 {
     if(m_resource == nullptr) {
         return;

@@ -70,14 +70,14 @@
      </property>
     </widget>
     <addaction name="actionNewFile"/>
-    <addaction name="actionOpenFile"/>
+    <addaction name="actionOpenFiles"/>
     <addaction name="menu_RecentlyUsedFiles"/>
     <addaction name="separator"/>
-    <addaction name="actionSaveFile"/>
-    <addaction name="actionSaveFileAs"/>
+    <addaction name="actionSaveCurrentFile"/>
+    <addaction name="actionSaveCurrentFileAs"/>
     <addaction name="actionSaveAllFiles"/>
     <addaction name="separator"/>
-    <addaction name="actionCloseFile"/>
+    <addaction name="actionCloseCurrentFile"/>
     <addaction name="actionCloseAllFiles"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
@@ -167,29 +167,29 @@
     <string>Ctrl+N</string>
    </property>
   </action>
-  <action name="actionOpenFile">
+  <action name="actionOpenFiles">
    <property name="text">
     <string>&amp;Open</string>
    </property>
    <property name="toolTip">
-    <string>Open file</string>
+    <string>Open files</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
    </property>
   </action>
-  <action name="actionSaveFile">
+  <action name="actionSaveCurrentFile">
    <property name="text">
     <string>&amp;Save</string>
    </property>
    <property name="toolTip">
-    <string>Save file</string>
+    <string>Save current file</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
    </property>
   </action>
-  <action name="actionSaveFileAs">
+  <action name="actionSaveCurrentFileAs">
    <property name="enabled">
     <bool>false</bool>
    </property>
@@ -197,7 +197,7 @@
     <string>Save &amp;As...</string>
    </property>
    <property name="toolTip">
-    <string>Save file as...</string>
+    <string>Save current file as...</string>
    </property>
    <property name="shortcut">
     <string>Alt+Shift+S</string>
@@ -214,7 +214,7 @@
     <string>Ctrl+Shift+S</string>
    </property>
   </action>
-  <action name="actionCloseFile">
+  <action name="actionCloseCurrentFile">
    <property name="enabled">
     <bool>true</bool>
    </property>

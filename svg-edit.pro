@@ -25,26 +25,28 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
-        main.cpp \
-        mainwindow.cpp \
-        model.cpp \
-        graphicsview.cpp \
-        controller.cpp \
-        resource.cpp \
-        sourceview.cpp \
-        highlighter.cpp
+    main.cpp \
+    mainwindow.cpp \
+    graphicsview.cpp \
+    controller.cpp \
+    resource.cpp \
+    sourceview.cpp \
+    highlighter.cpp \
+    tab.cpp \
+    tabmodel.cpp
 
 HEADERS += \
-        mainwindow.h \
-        model.h \
-        graphicsview.h \
-        controller.h \
-        resource.h \
-        sourceview.h \
-        highlighter.h
+    mainwindow.h \
+    graphicsview.h \
+    controller.h \
+    resource.h \
+    sourceview.h \
+    highlighter.h \
+    tab.h \
+    tabmodel.h
 
 FORMS += \
-        mainwindow.ui
+    mainwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

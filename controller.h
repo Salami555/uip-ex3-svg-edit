@@ -4,7 +4,7 @@
 #include <QList>
 #include <QFileInfo>
 
-class Model;
+// class Model;
 
 
 class Controller : public QObject
@@ -14,13 +14,14 @@ class Controller : public QObject
 public:
     explicit Controller();
 
-    void setModel(Model * model);
-    Model * model() const;
+    // void setModel(Model * model);
+    // Model * model() const;
 
 signals:
 
 public slots:
     void newResource() const;
+    void openResources(const QStringList & filePaths) const;
     void openResources(const QList<QFileInfo> & files) const;
     void openResource(const QString & file) const;
     void saveResource() const;
@@ -31,6 +32,6 @@ public slots:
     void exit(int code = 0);
 
 protected:
-    Model * m_model;
+    // Model * m_model;
 
 };
