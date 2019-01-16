@@ -35,6 +35,15 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
+      <property name="documentMode">
+       <bool>true</bool>
+      </property>
+      <property name="tabsClosable">
+       <bool>true</bool>
+      </property>
+      <property name="movable">
+       <bool>true</bool>
+      </property>
       <widget class="QWidget" name="welcome">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -45,6 +54,22 @@
        <attribute name="title">
         <string>Welcome</string>
        </attribute>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>&lt;html&gt;
+&lt;head/&gt;
+&lt;body&gt;
+&lt;h1&gt;Welcome to SVG-Edit&lt;/h1&gt;
+&lt;p&gt;Edit your SVG files with pain and seizures.&lt;/p&gt;
+&lt;hr/&gt;
+&lt;p align=&quot;center&quot;&gt;Drop your files here to load them!&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        </property>
+       </widget>
       </widget>
      </widget>
     </item>
