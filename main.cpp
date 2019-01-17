@@ -8,6 +8,7 @@
 int main(int argc, char * argv[])
 {
     QApplication application(argc, argv);
+    application.setStyle("windows");
 
     Controller controller;
 //    controller.setModel(&model);
