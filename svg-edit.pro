@@ -28,7 +28,6 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     graphicsview.cpp \
-    controller.cpp \
     resource.cpp \
     sourceview.cpp \
     highlighter.cpp \
@@ -38,7 +37,6 @@ SOURCES += \
 HEADERS += \
     mainwindow.h \
     graphicsview.h \
-    controller.h \
     resource.h \
     sourceview.h \
     highlighter.h \

@@ -3,9 +3,6 @@
 #include <QMainWindow>
 #include <QFileInfo>
 
-class Controller;
-//class Model;
-
 class GraphicsView;
 class SourceView;
 
@@ -24,12 +21,6 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget * parent = nullptr);
 
-//    void setModel(const Model * model);
-//    const Model * model() const;
-
-    void setController(const Controller * controller);
-    const Controller * controller() const;
-
 protected:
     void initializeGraphicsView();
     void initializeSourceView();
@@ -41,6 +32,7 @@ protected:
     virtual void closeEvent(QCloseEvent * event);
 
 private slots:
+    void on_actionExit_triggered();
 //    void onResourceOpenend();
 //    void onResourceClosed();
 //    void onResourceModified();
@@ -48,6 +40,8 @@ private slots:
 //    void onResourceOperationFailed(ResourceOperationResult result);
 
     void on_actionOpenFiles_triggered();
+
+    void on_tabCloseRequested(int index);
 
 //    void on_actionSwapViews_triggered();
 
@@ -61,10 +55,8 @@ private slots:
 //    void on_actionZoomIn_triggered();
 //    void on_actionZoomOut_triggered();
 
-protected:
-//    const Model * m_model = nullptr;            // Intent: receive signals from.
-    const Controller * m_controller = nullptr;  // Intent: emit signals to.
-
 private:
     Ui::MainWindow * m_ui;
+
+    void openFiles(const QList<QFileInfo> files);
 };

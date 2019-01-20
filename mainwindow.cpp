@@ -9,16 +9,14 @@
 #include <QDropEvent>
 #include <QMimeData>
 #include <QMessageBox>
+#include <QDebug>
 
 // #include "tabmodel.h"
 #include "resource.h"
-#include "controller.h"
 
 #include "tab.h"
 #include "graphicsview.h"
 #include "sourceview.h"
-
-#include <QDebug>
 
 
 MainWindow::MainWindow(QWidget * parent) :
@@ -33,6 +31,9 @@ MainWindow::MainWindow(QWidget * parent) :
     //    m_ui->sourceView->setHighlighting(true);
     //    m_ui->sourceView->setWordWrap(true);
 
+    connect(m_ui->tabView, &QTabWidget::tabCloseRequested, this, &MainWindow::on_tabCloseRequested);
+    connect(m_ui->actionExit, &QAction::triggered, this, &MainWindow::on_actionExit_triggered);
+
     // connect(m_ui->actionViewSource, SIGNAL(triggered()), this, SLOT(foobar1()));
     // connect(m_ui->actionViewSource, &QAction::triggered,[]() { qDebug() << "test mit lambda"; });
     // connect(m_ui->actionSelectAll, &QAction::triggered, m_ui->sourceView, &SourceView::selectAll);
@@ -42,57 +43,40 @@ MainWindow::MainWindow(QWidget * parent) :
 }
 
 
-//void MainWindow::setModel(const Model * model)
-//{
-//    if(m_model == model) {
-//        return;
-//    }
-
-//    if(m_model != nullptr) {
-//        // disconnect();
-//    }
-//    m_model = model;
-
-//    if(m_model!= nullptr) {
-//        connect(m_model, &Model::resourceOpened, this, &MainWindow::onResourceOpenend);
-//        connect(m_model, &Model::resourceClosed, this, &MainWindow::onResourceClosed);
-//        connect(m_model, &Model::resourceModified, this, &MainWindow::onResourceModified);
-//        connect(m_model, &Model::operationFailed, this, &MainWindow::onResourceOperationFailed);
-//    }
-//}
-
-//const Model * MainWindow::model() const
-//{
-//    return m_model;
-//}
-
-
-void MainWindow::setController(const Controller * controller)
-{
-    if(m_controller == controller) {
-        return;
-    }
-
-    if(m_controller != nullptr) {
-        m_controller->disconnect();
-    }
-    m_controller = controller;
-
-    if(m_controller != nullptr) {
-//        connect(m_ui->actionNewFile, &QAction::triggered, m_controller, &Controller::newResource);
-//        connect(m_ui->actionSaveFile, &QAction::triggered, m_controller, &Controller::saveResource);
-//        connect(m_ui->actionCloseFile, &QAction::triggered, m_controller, &Controller::closeResource);
-
-        connect(m_ui->actionExit, &QAction::triggered, m_controller, &Controller::exit);
-    }
+// ----- Utils -----------------------------------------------
+template<typename Base, typename T>
+inline bool instanceof(const T *ptr) {
+    return dynamic_cast<const Base*>(ptr) != nullptr;
 }
 
-const Controller * MainWindow::controller() const
+bool confirmDiscardingUnsavedChanges(QWidget *parent)
 {
-    return m_controller;
+    auto reply = QMessageBox::question(
+        parent,
+        "File not saved",
+        "Do you want to discard the current changes?",
+        QMessageBox::Yes|QMessageBox::No
+    );
+    return reply == QMessageBox::Yes;
 }
 
 
+// ----- Control -----------------------------------------------
+void MainWindow::openFiles(const QList<QFileInfo> files)
+{
+    for(auto c : files) {
+        qDebug() << c;
+    }
+    for(int i = 0; i < m_ui->tabView->count(); ++i) {
+        auto tab = m_ui->tabView->widget(i);
+        if(instanceof<Tab>(tab)) {
+            qDebug() << tab;
+        }
+    }
+}
+
+
+// ----- Events -----------------------------------------------
 void MainWindow::dragEnterEvent(QDragEnterEvent *event)
 {
     if (event->mimeData()->hasUrls())
@@ -107,7 +91,7 @@ void MainWindow::dropEvent(QDropEvent * event)
         for(QUrl url : mimeData->urls()) {
             files.append(QFileInfo(url.toLocalFile()));
         }
-        this->controller()->openResources(files);
+        this->openFiles(files);
     }
 }
 
@@ -119,13 +103,32 @@ void MainWindow::showEvent(QShowEvent * event)
     for(short i = 1; i < args.size(); i++) {
         files.append(QFileInfo(args[i]));
     }
-    this->controller()->openResources(files);
+    this->openFiles(files);
+}
+
+bool isEveryFileSaved(const QTabWidget * tabView)
+{
+    for(int i = 0; i < tabView->count(); ++i) {
+        auto widget = tabView->widget(i);
+        if(instanceof<Tab>(widget)) {
+            const Tab *tab = dynamic_cast<const Tab*>(widget);
+            if(tab->hasPendingChanges()) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 void MainWindow::closeEvent(QCloseEvent * event)
 {
+    if(!isEveryFileSaved(m_ui->tabView)) {
+        if(!confirmDiscardingUnsavedChanges(this)) {
+            event->ignore();
+            return;
+        }
+    }
     m_ui->actionExit->trigger();
-    Q_UNUSED(event);
 }
 
 
@@ -171,6 +174,11 @@ void MainWindow::closeEvent(QCloseEvent * event)
     //    m_ui->splitter->setSizes(sizes);
 //}
 
+void MainWindow::on_actionExit_triggered()
+{
+    qApp->exit();
+}
+
 void MainWindow::on_actionOpenFiles_triggered()
 {
     auto dialog = new QFileDialog(this);
@@ -181,7 +189,27 @@ void MainWindow::on_actionOpenFiles_triggered()
     dialog->setMimeTypeFilters({ "image/svg+xml" });
     dialog->setNameFilter("Scalable Vector Graphic Files (*.svg);; All Files (*.*)");
 
-    dialog->open(const_cast<Controller *>(m_controller), SLOT(openResources(const QStringList &)));
+    dialog->open(const_cast<MainWindow *>(this), SLOT(openResources(const QStringList &)));
+}
+
+void MainWindow::on_tabCloseRequested(int index)
+{
+    auto widget = m_ui->tabView->widget(index);
+    if(instanceof<Tab>(widget)) {
+        const Tab *tab = dynamic_cast<const Tab*>(widget);
+        if(tab->hasPendingChanges()) {
+            if(!confirmDiscardingUnsavedChanges((QWidget *)tab)) {
+                return;
+            }
+        }
+    }
+
+    m_ui->tabView->removeTab(index);
+
+    qDebug() << m_ui->tabView->count();
+    if(m_ui->tabView->count() == 0) {
+        m_ui->actionExit->trigger();
+    }
 }
 
 //void MainWindow::on_actionFitView_toggled(bool enabled) const
