@@ -4,8 +4,7 @@
 #include <QFileInfo>
 #include <QSettings>
 
-class GraphicsView;
-class SourceView;
+class Tab;
 
 enum class ResourceOperationResult;
 
@@ -24,6 +23,7 @@ public:
 
 protected:
     void updateWindowTitle();
+    void addTab(Tab * tab);
     void openFiles(const QList<QFileInfo> files);
 
     void toggleAllSplitterPositionModifiers();

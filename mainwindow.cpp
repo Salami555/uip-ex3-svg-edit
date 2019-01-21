@@ -65,22 +65,82 @@ void MainWindow::updateWindowTitle()
 }
 
 const QMimeDatabase db;
-QList<QFileInfo> filterSVGFiles(const QList<QUrl> & fileURLs)
+bool isSVGFile(const QFileInfo & file)
+{
+    auto mimeType = db.mimeTypeForFile(file);
+    return mimeType.name() == "image/svg+xml";
+}
+QList<QFileInfo> filterSVGFiles(const QList<QFileInfo> & allFiles)
+{
+    QList<QFileInfo> svgFiles;
+    for(auto file : allFiles) {
+        if(isSVGFile(file)) {
+            svgFiles.append(file);
+        }
+    }
+    return svgFiles;
+}
+QList<QFileInfo> filterExistingPaths(const QList<QFileInfo> & allFiles)
+{
+    QList<QFileInfo> existingFiles;
+    for(auto file : allFiles) {
+        if(file.exists()) {
+            existingFiles.append(file);
+        }
+    }
+    return existingFiles;
+}
+QList<QFileInfo> names2fileinfos(const QStringList & filenames, const QString & path = "")
 {
     QList<QFileInfo> files;
-    for(QUrl url : fileURLs) {
-        auto file = QFileInfo(url.toLocalFile());
-        auto mimeType = db.mimeTypeForFile(file);
-        if(mimeType.name() == "image/svg+xml") {
-            files.append(file);
+    for(auto filename : filenames) {
+        if(!path.isEmpty()) {
+            filename = path + QDir::separator() + filename;
+        }
+        QFileInfo file(filename);
+        files.append(file);
+    }
+    return files;
+}
+QList<QFileInfo> urls2fileinfos(const QList<QUrl> & fileURLs)
+{
+    QList<QFileInfo> files;
+    for(auto url : fileURLs) {
+        QFileInfo file(url.toLocalFile());
+        files.append(file);
+    }
+    return files;
+}
+QList<QFileInfo> directoryExtractor(const QList<QFileInfo> & filesAndDirs)
+{
+    QList<QFileInfo> files;
+    for(auto fileOrDir : filesAndDirs) {
+        if(fileOrDir.isFile()) {
+            files.append(fileOrDir);
+        } else if(fileOrDir.isDir()) {
+            // workaround, because final / is missing with .dir()
+            auto path = fileOrDir.filePath();
+            if(!path.endsWith(QDir::separator())) {
+                path.append(QDir::separator());
+            }
+            QDir dir(path);
+            // end workaround
+
+            auto filenames = dir.entryList(QDir::Files | QDir::NoDotAndDotDot);
+            files.append(names2fileinfos(filenames, dir.path()));
         }
     }
     return files;
 }
+QList<QFileInfo> preprocessFileList(const QList<QFileInfo> & files)
+{
+    return filterSVGFiles(directoryExtractor(filterExistingPaths(files)));
+}
 
 // --- Settings
-const QString SETTING_LAST_DIRECTORY_OPEN = "last_directory/open";
-const QString SETTING_LAST_DIRECTORY_SAVE = "last_directory/save";
+const QString SETTING_RECENT_FILES = "last_state/used_files";
+const QString SETTING_LAST_DIRECTORY_OPEN = "last_state/directories/open";
+const QString SETTING_LAST_DIRECTORY_SAVE = "last_state/directories/save";
 const QString SETTING_STYLE_DEFAULT_FONT = "style/default_font";
 const QString SETTING_STYLE_WORD_WRAP = "style/word_wrap";
 const QString SETTING_STYLE_HIGHLIGHTING = "style/highlighting";
@@ -105,7 +165,8 @@ void MainWindow::dragEnterEvent(QDragEnterEvent *event)
 {
     const QMimeData* mimeData = event->mimeData();
     if (mimeData->hasUrls()) {
-        if(!filterSVGFiles(mimeData->urls()).isEmpty()) {
+        auto fileList = preprocessFileList(urls2fileinfos(mimeData->urls()));
+        if(!fileList.isEmpty()) {
             event->acceptProposedAction();
         }
     }
@@ -115,7 +176,8 @@ void MainWindow::dropEvent(QDropEvent * event)
 {
     const QMimeData* mimeData = event->mimeData();
     if (mimeData->hasUrls()) {
-        this->openFiles(filterSVGFiles(mimeData->urls()));
+        auto fileList = preprocessFileList(urls2fileinfos(mimeData->urls()));
+        this->openFiles(fileList);
     }
 }
 
@@ -124,11 +186,9 @@ void MainWindow::showEvent(QShowEvent * event)
     QMainWindow::showEvent(event);
     qApp->setApplicationDisplayName(qApp->applicationName());
     this->setWindowTitle(qApp->applicationName());
-    QStringList args = qApp->arguments();
-    QList<QFileInfo> files;
-    for(short i = 1; i < args.size(); i++) {
-        files.append(QFileInfo(args[i]));
-    }
+    QStringList args(qApp->arguments());
+    args.removeFirst();
+    auto files = preprocessFileList(names2fileinfos(args));
     this->openFiles(files);
 }
 
@@ -185,11 +245,8 @@ void MainWindow::on_actionOpenFiles_triggered()
     dialog->setDirectory(m_settings->value(SETTING_LAST_DIRECTORY_OPEN, ".").toString());
 
     if(dialog->exec()) {
-        QList<QFileInfo> files;
         m_settings->setValue(SETTING_LAST_DIRECTORY_OPEN, dialog->directory().path());
-        for(auto filename : dialog->selectedFiles()) {
-            files.append(QFileInfo(filename));
-        }
+        auto files = preprocessFileList(names2fileinfos(dialog->selectedFiles()));
         this->openFiles(files);
     }
 }
@@ -212,6 +269,13 @@ bool isFileOpened(const QTabWidget * tabs, QFileInfo &file)
     return false;
 }
 
+void MainWindow::addTab(Tab * tab)
+{
+    setFontIfExists(m_settings, tab->sourceView());
+    m_ui->tabView->addTab(tab, tab->name());
+    connect(tab->resource(), &Resource::changed, this, &MainWindow::on_modifiedStatusChange);
+}
+
 void MainWindow::openFiles(const QList<QFileInfo> files)
 {
     int newTabIndex = m_ui->tabView->count();
@@ -223,9 +287,7 @@ void MainWindow::openFiles(const QList<QFileInfo> files)
 
         auto newTab = new Tab(m_ui->tabView);
         if(newTab->loadFile(file)) {
-            setFontIfExists(m_settings, newTab->sourceView());
-            m_ui->tabView->addTab(newTab, file.baseName());
-            connect(newTab->resource(), &Resource::changed, this, &MainWindow::on_modifiedStatusChange);
+            this->addTab(newTab);
             tabAdded = true;
         }
     }

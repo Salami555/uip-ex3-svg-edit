@@ -38,7 +38,11 @@ bool Tab::loadFile(const QFileInfo& file)
         m_graphicView->setResource(m_resource);
         return true;
     } else {
-        QMessageBox::critical(this, "File opening failed", "Error code: " + Resource::operationResultString(result));
+        QMessageBox::critical(
+            this, "File opening failed",
+            "Error code: " + Resource::operationResultString(result)
+                + "\nwith: " + m_resource->file().fileName()
+        );
         return false;
     }
 }
@@ -50,7 +54,11 @@ bool Tab::saveFile()
         this->setWindowModified(false);
         return true;
     } else {
-        QMessageBox::critical(this, "File saving failed", "Error code: " + Resource::operationResultString(result));
+        QMessageBox::critical(
+            this, "File saving failed",
+            "Error code: " + Resource::operationResultString(result)
+                + "\nwith: " + m_resource->file().fileName()
+        );
         return false;
     }
 }
