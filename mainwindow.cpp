@@ -140,8 +140,8 @@ QList<QFileInfo> preprocessFileList(const QList<QFileInfo> & files)
 
 // --- Settings -----------------------------------------------
 const QString SETTING_RECENT_FILES = "last_state/used_files";
-const QString SETTING_LAST_DIRECTORY_OPEN = "last_state/directories/open";
-const QString SETTING_LAST_DIRECTORY_SAVE = "last_state/directories/save";
+const QString SETTING_LAST_OPEN_PATH = "last_state/directories/open";
+const QString SETTING_LAST_SAVE_PATH = "last_state/directories/save";
 const QString SETTING_STYLE_DEFAULT_FONT = "style/default_font";
 const QString SETTING_STYLE_WORD_WRAP = "style/word_wrap";
 const QString SETTING_STYLE_HIGHLIGHTING = "style/highlighting";
@@ -158,6 +158,22 @@ void setFontIfExists(QSettings * settings, SourceView * sourceView, const QStrin
         font.fromString(settings->value(key).toString());
         sourceView->setFont(font);
     }
+}
+
+QString lastDirectoryOpenPath(const QSettings * settings)
+{
+    return settings->value(
+        SETTING_LAST_OPEN_PATH,
+        QFileInfo("./").absoluteFilePath()
+    ).toString();
+}
+
+QString lastDirectorySavePath(const QSettings * settings)
+{
+    return settings->value(
+        SETTING_LAST_SAVE_PATH,
+        lastDirectoryOpenPath(settings)
+    ).toString();
 }
 
 
@@ -244,13 +260,10 @@ void MainWindow::on_actionOpenFiles_triggered()
 
     dialog->setMimeTypeFilters({ "image/svg+xml" });
     dialog->setNameFilter("Scalable Vector Graphic Files (*.svg);; All Files (*.*)");
-    dialog->setDirectory(m_settings->value(
-        SETTING_LAST_DIRECTORY_OPEN,
-        QFileInfo("./").absoluteFilePath()
-    ).toString());
+    dialog->setDirectory(lastDirectoryOpenPath(m_settings));
 
     if(dialog->exec()) {
-        m_settings->setValue(SETTING_LAST_DIRECTORY_OPEN, dialog->directory().path());
+        m_settings->setValue(SETTING_LAST_OPEN_PATH, dialog->directory().path());
         auto files = preprocessFileList(names2fileinfos(dialog->selectedFiles()));
         this->openFiles(files);
     }
@@ -278,6 +291,7 @@ void MainWindow::addTab(Tab * tab)
 {
     setFontIfExists(m_settings, tab->sourceView());
     m_ui->tabView->addTab(tab, tab->name());
+    m_ui->actionSaveCurrentFile->setDisabled(true);
     connect(tab->resource(), &Resource::changed, this, &MainWindow::on_modifiedStatusChange);
 }
 
@@ -314,7 +328,29 @@ void MainWindow::on_actionSaveCurrentFile_triggered()
 
 void MainWindow::on_actionSaveCurrentFileAs_triggered()
 {
+    auto widget = m_ui->tabView->currentWidget();
+    if(instanceof<Tab>(widget)) {
+        Tab *tab = dynamic_cast<Tab*>(widget);
 
+        auto dialog = new QFileDialog(this);
+        dialog->setWindowModality(Qt::WindowModality::ApplicationModal);
+        dialog->setFileMode(QFileDialog::AnyFile);
+        dialog->setViewMode(QFileDialog::Detail);
+        dialog->setAcceptMode(QFileDialog::AcceptSave);
+
+        dialog->setMimeTypeFilters({ "image/svg+xml" });
+        dialog->setNameFilter("Scalable Vector Graphic Files (*.svg);; All Files (*.*)");
+        dialog->setDirectory(lastDirectorySavePath(m_settings));
+        dialog->selectFile(tab->resource()->file().fileName());
+
+        if(dialog->exec()) {
+            m_settings->setValue(SETTING_LAST_SAVE_PATH, dialog->directory().path());
+            QFileInfo file(dialog->selectedFiles().first());
+            if(tab->saveFileAs(file)) {
+                this->on_modifiedStatusChange();
+            }
+        }
+    }
 }
 
 void MainWindow::on_actionSaveAllFiles_triggered()
@@ -412,9 +448,13 @@ void MainWindow::on_tabSelected()
 {
     auto widget = m_ui->tabView->currentWidget();
     if(instanceof<Tab>(widget)) {
+        const Tab *tab = dynamic_cast<const Tab*>(widget);
+
+        m_ui->actionSaveCurrentFile->setEnabled(tab->resource()->isUnsaved());
+        m_ui->actionSaveCurrentFileAs->setEnabled(true);
+        m_ui->actionSaveAllFiles->setEnabled(true);
         m_ui->menu_Edit->setEnabled(true);
         m_ui->menu_View->setEnabled(true);
-        const Tab *tab = dynamic_cast<const Tab*>(widget);
         this->updateWindowTitle();
 
         m_ui->actionSetLineWrap->disconnect(SIGNAL(triggered()));
@@ -429,6 +469,9 @@ void MainWindow::on_tabSelected()
             this->toggleAllSplitterPositionModifiers();
         }
     } else {
+        m_ui->actionSaveCurrentFile->setDisabled(true);
+        m_ui->actionSaveCurrentFileAs->setDisabled(true);
+        m_ui->actionSaveAllFiles->setDisabled(true);
         m_ui->menu_Edit->setDisabled(true);
         m_ui->menu_View->setDisabled(true);
         this->setWindowTitle(qApp->applicationName());
@@ -454,10 +497,11 @@ void MainWindow::on_modifiedStatusChange()
 {
     auto widget = m_ui->tabView->currentWidget();
     if(instanceof<Tab>(widget)) {
-        QString name = dynamic_cast<Tab*>(widget)->name();
+        const Tab * tab = dynamic_cast<Tab*>(widget);
+        m_ui->actionSaveCurrentFile->setEnabled(tab->resource()->isUnsaved());
         m_ui->tabView->setTabText(
             m_ui->tabView->currentIndex(),
-            name
+            tab->name()
         );
         this->updateWindowTitle();
     }

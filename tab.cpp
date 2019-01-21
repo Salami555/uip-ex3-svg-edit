@@ -63,6 +63,22 @@ bool Tab::saveFile()
     }
 }
 
+bool Tab::saveFileAs(const QFileInfo& file)
+{
+    auto result = m_resource->save(file);
+    if(result == ResourceOperationResult::Success) {
+        this->setWindowModified(false);
+        return true;
+    } else {
+        QMessageBox::critical(
+            this, "File saving failed",
+            "Error code: " + Resource::operationResultString(result)
+                + "\nwith: " + m_resource->file().fileName()
+        );
+        return false;
+    }
+}
+
 void Tab::sourceChanged()
 {
     auto result = m_resource->setSource(m_sourceView->source());
