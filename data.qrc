@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="picasso-dog">picassodog.svg</file>
+        <file alias="ps-background">ps-background.png</file>
+    </qresource>
+</RCC>
