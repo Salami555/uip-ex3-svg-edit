@@ -16,18 +16,22 @@ class SourceView: public QWidget
 public:
     explicit SourceView(QWidget * parent = nullptr);
 
+    const QFont font() const;
+    bool hasHighlighting() const;
+    bool hasWordWrap() const;
     QString source() const;
 
 signals:
-    void highlightChanged(bool enabled) const;
+    void highlightingChanged(bool enabled) const;
     void wordWrapChanged(bool enabled) const;
     void sourceChanged() const;
 
 public slots:
     void setResource(const Resource * resource);
 
-    void setHighlighting(bool enable) const;
-    void setWordWrap(bool enable) const;
+    void setFont(const QFont & font);
+    void setHighlighting(bool enable);
+    void setWordWrap(bool enable);
 
     void selectAll() const;
 

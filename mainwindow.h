@@ -23,8 +23,7 @@ public:
     explicit MainWindow(QWidget * parent = nullptr);
 
 protected:
-    void initializeGraphicsView();
-    void initializeSourceView();
+    void openFiles(const QList<QFileInfo> files);
 
     virtual void dragEnterEvent(QDragEnterEvent * event);
     virtual void dropEvent(QDropEvent * event);
@@ -39,27 +38,20 @@ private slots:
 
 //    void onResourceOperationFailed(ResourceOperationResult result);
 
+    // menu trigger
     void on_actionOpenFiles_triggered();
-    void openFiles(const QList<QFileInfo> files);
 
     void on_actionCloseCurrentFile_triggered();
     void on_actionCloseAllFiles_triggered();
     void on_actionExit_triggered();
 
+    void on_actionChangeFont_triggered();
+
+    void on_actionAbout_triggered();
+
+    // generic
     void on_tabSelected();
     void on_tabCloseRequested(int index);
-
-//    void on_actionSwapViews_triggered();
-
-//    void on_actionFitView_toggled(bool enabled) const;
-//    void on_graphicsView_fitViewChanged(bool enabled) const;
-
-//    void on_sourceView_highlightChanged(bool enabled) const;
-//    void on_sourceView_wordWrapChanged(bool enabled) const;
-//    void on_sourceView_sourceChanged() const;
-
-//    void on_actionZoomIn_triggered();
-//    void on_actionZoomOut_triggered();
 
 private:
     Ui::MainWindow * m_ui;

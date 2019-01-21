@@ -10,6 +10,7 @@
 #include <QMimeDatabase>
 #include <QMimeData>
 #include <QMessageBox>
+#include <QFontDialog>
 #include <QDebug>
 
 // #include "tabmodel.h"
@@ -178,7 +179,6 @@ void MainWindow::on_actionOpenFiles_triggered()
     if(dialog->exec()) {
         QList<QFileInfo> files;
         m_settings->setValue("last_open_directory", dialog->directory().path());
-        qDebug() << dialog->directory().path();
         for(auto filename : dialog->selectedFiles()) {
             files.append(QFileInfo(filename));
         }
@@ -252,11 +252,41 @@ void MainWindow::on_actionExit_triggered()
     qApp->exit();
 }
 
+void MainWindow::on_actionChangeFont_triggered()
+{
+    const Tab *tab = dynamic_cast<const Tab*>(m_ui->tabView->currentWidget());
+    QFontDialog fontChooser(tab->sourceView()->font(), this);
+    fontChooser.setOption(QFontDialog::MonospacedFonts);
+    if(fontChooser.exec()) {
+        tab->sourceView()->setFont(fontChooser.selectedFont());
+    }
+}
+
+void MainWindow::on_actionAbout_triggered()
+{
+    QMessageBox::about(
+        this, "About SVG-Edit",
+        "This application was designed and written for the User Interface Programming course at the Hasso Plattner Institute Potsdam.\nThis is the contribution for exercise 3 by Maximilian Stiede.\nIt is horrible simple, thus please don't look at it and especially do _not_ use it in real life matters *!\nGood luck trying to use it ;)\n(c) 2019 Maximilian Stiede\n\n(*Beware of memory leaks)"
+    );
+}
+
 void MainWindow::on_tabSelected()
 {
     auto widget = m_ui->tabView->currentWidget();
-    bool isFileTab = instanceof<Tab>(widget);
-    m_ui->actionCloseCurrentFile->setEnabled(isFileTab);
+    if(instanceof<Tab>(widget)) {
+        m_ui->menu_View->setEnabled(true);
+        const Tab *tab = dynamic_cast<const Tab*>(widget);
+
+        m_ui->actionSetLineWrap->disconnect(SIGNAL(triggered()));
+        m_ui->actionSetLineWrap->setChecked(tab->sourceView()->hasWordWrap());
+        connect(m_ui->actionSetLineWrap, &QAction::triggered, tab->sourceView(), &SourceView::setWordWrap);
+
+        m_ui->actionSetSyntaxHighlighting->disconnect(SIGNAL(triggered()));
+        m_ui->actionSetSyntaxHighlighting->setChecked(tab->sourceView()->hasHighlighting());
+        connect(m_ui->actionSetSyntaxHighlighting, &QAction::triggered, tab->sourceView(), &SourceView::setHighlighting);
+    } else {
+        m_ui->menu_View->setDisabled(true);
+    }
 }
 
 void MainWindow::on_tabCloseRequested(int index)

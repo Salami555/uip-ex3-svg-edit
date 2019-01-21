@@ -119,7 +119,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>20</height>
+     <height>17</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -161,6 +161,9 @@
     <addaction name="actionGoto"/>
    </widget>
    <widget class="QMenu" name="menu_View">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="title">
      <string>&amp;View</string>
     </property>
@@ -168,9 +171,9 @@
      <property name="title">
       <string>&amp;Source</string>
      </property>
-     <addaction name="actionChangeFontSize"/>
-     <addaction name="actionToggleSyntaxHighlighting"/>
-     <addaction name="actionToggleLineWrap"/>
+     <addaction name="actionChangeFont"/>
+     <addaction name="actionSetSyntaxHighlighting"/>
+     <addaction name="actionSetLineWrap"/>
      <addaction name="separator"/>
      <addaction name="actionSourceViewToLeftSide"/>
      <addaction name="actionSourceViewToRightSide"/>
@@ -472,23 +475,17 @@
     <string>Ctrl+0</string>
    </property>
   </action>
-  <action name="actionChangeFontSize">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
+  <action name="actionChangeFont">
    <property name="text">
-    <string>&amp;Font Size</string>
+    <string>Change &amp;Font</string>
    </property>
    <property name="toolTip">
-    <string>Font size settings</string>
+    <string>Font settings</string>
    </property>
   </action>
-  <action name="actionToggleLineWrap">
+  <action name="actionSetLineWrap">
    <property name="checkable">
     <bool>true</bool>
-   </property>
-   <property name="enabled">
-    <bool>false</bool>
    </property>
    <property name="text">
     <string>Line &amp;Wrap</string>
@@ -497,12 +494,9 @@
     <string>Toggle line wrap</string>
    </property>
   </action>
-  <action name="actionToggleSyntaxHighlighting">
+  <action name="actionSetSyntaxHighlighting">
    <property name="checkable">
     <bool>true</bool>
-   </property>
-   <property name="enabled">
-    <bool>false</bool>
    </property>
    <property name="text">
     <string>Syntax &amp;Highlighting</string>

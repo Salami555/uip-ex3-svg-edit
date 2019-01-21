@@ -32,12 +32,12 @@ void Tab::loadFile(const QFileInfo& file)
     auto opResult = m_resource->load(file.absoluteFilePath());
 }
 
-const GraphicsView * Tab::graphicsView() const
+GraphicsView * Tab::graphicsView() const
 {
     return m_graphicView;
 }
 
-const SourceView * Tab::sourceView() const
+SourceView * Tab::sourceView() const
 {
     return m_sourceView;
 }

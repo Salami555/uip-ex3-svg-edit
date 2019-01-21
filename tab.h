@@ -19,8 +19,8 @@ public:
 
     void loadFile(const QFileInfo& file);
 
-    const GraphicsView * graphicsView() const;
-    const SourceView * sourceView() const;
+    GraphicsView * graphicsView() const;
+    SourceView * sourceView() const;
 
     const Resource * resource() const;
 

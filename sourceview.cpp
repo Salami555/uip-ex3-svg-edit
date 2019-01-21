@@ -6,6 +6,7 @@
 #include <QTextCursor>
 #include <QTextDocumentFragment>
 #include <QRegExp>
+#include <QDebug>
 
 #include "resource.h"
 #include "highlighter.h"
@@ -54,22 +55,42 @@ void SourceView::setResource(const Resource * resource)
     m_textEdit->blockSignals(false);
 }
 
-void SourceView::setHighlighting(bool enable) const
+void SourceView::setFont(const QFont & font)
+{
+    m_textEdit->setFont(font);
+}
+
+const QFont SourceView::font() const
+{
+    return m_textEdit->font();
+}
+
+void SourceView::setHighlighting(bool enable)
 {
     if(enable == false && m_highlighter->document() == nullptr) {
         return;
     }
     m_highlighter->setDocument(enable ? m_textEdit->document() : nullptr);
-    emit highlightChanged(enable);
+    emit highlightingChanged(enable);
 }
 
-void SourceView::setWordWrap(bool enable) const
+bool SourceView::hasHighlighting() const
+{
+    return m_highlighter->document() != nullptr;
+}
+
+void SourceView::setWordWrap(bool enable)
 {
     if(enable == false && m_textEdit->wordWrapMode() == QTextOption::NoWrap) {
         return;
     }
     m_textEdit->setWordWrapMode(enable ? QTextOption::WrapAnywhere : QTextOption::NoWrap);
     emit wordWrapChanged(enable);
+}
+
+bool SourceView::hasWordWrap() const
+{
+    return m_textEdit->wordWrapMode() != QTextOption::NoWrap;
 }
 
 void SourceView::selectAll() const
