@@ -25,6 +25,9 @@ public:
 protected:
     void openFiles(const QList<QFileInfo> files);
 
+    void toggleAllSplitterPositionModifiers();
+    void swapCurrentTabSplitterContent();
+
     virtual void dragEnterEvent(QDragEnterEvent * event);
     virtual void dropEvent(QDropEvent * event);
 

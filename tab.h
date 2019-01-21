@@ -18,6 +18,8 @@ public:
     ~Tab();
 
     bool loadFile(const QFileInfo& file);
+    void swapContentPositions(bool restoreSize = true);
+    bool isDefaultPositioned() const;
 
     GraphicsView * graphicsView() const;
     SourceView * sourceView() const;
@@ -29,4 +31,7 @@ protected:
     SourceView * m_sourceView;
 
     Resource * m_resource;
+
+private:
+    bool m_defaultPositioned = true;
 };

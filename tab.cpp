@@ -19,6 +19,7 @@ Tab::Tab(QWidget * parent) : QSplitter(parent)
     m_sourceView = sourceView;
 
     this->setOrientation(Qt::Orientation::Horizontal);
+    // default: left source, right graphic
     this->addWidget(m_sourceView);
     this->addWidget(m_graphicView);
 }
@@ -38,6 +39,27 @@ bool Tab::loadFile(const QFileInfo& file)
         QMessageBox::critical(this, "File opening failed", "Error code: " + Resource::operationResultString(result));
         return false;
     }
+}
+
+void Tab::swapContentPositions(bool restoreSize)
+{
+    const auto widget0 = this->widget(0);
+    const auto widget1 = this->widget(1);
+
+    const auto sizes = this->sizes();
+
+    this->insertWidget(0, widget1);
+    this->insertWidget(1, widget0);
+
+    if(restoreSize) {
+        this->setSizes(sizes);
+    }
+    m_defaultPositioned = !m_defaultPositioned;
+}
+
+bool Tab::isDefaultPositioned() const
+{
+    return m_defaultPositioned;
 }
 
 GraphicsView * Tab::graphicsView() const

@@ -29,6 +29,11 @@ MainWindow::MainWindow(QWidget * parent) :
     QSettings::setDefaultFormat(QSettings::IniFormat);
     m_settings = new QSettings();
 
+    connect(m_ui->actionSourceViewToLeftSide, &QAction::triggered, this, &MainWindow::swapCurrentTabSplitterContent);
+    connect(m_ui->actionSourceViewToRightSide, &QAction::triggered, this, &MainWindow::swapCurrentTabSplitterContent);
+    connect(m_ui->actionGraphicViewToLeftSide, &QAction::triggered, this, &MainWindow::swapCurrentTabSplitterContent);
+    connect(m_ui->actionGraphicViewToRightSide, &QAction::triggered, this, &MainWindow::swapCurrentTabSplitterContent);
+
     connect(m_ui->tabView, &QTabWidget::currentChanged, this, &MainWindow::on_tabSelected);
     connect(m_ui->tabView, &QTabWidget::tabCloseRequested, this, &MainWindow::on_tabCloseRequested);
 }
@@ -123,21 +128,6 @@ void MainWindow::closeEvent(QCloseEvent * event)
 
 
 // ----- SLOTS -----------------------------------------------
-//void MainWindow::onResourceOpenend()
-//{
-//    auto alert = new QMessageBox(this);
-//    alert->setText("opened resource: " + m_model->resource()->fileInfo().fileName());
-//    alert->showNormal();
-    //    m_ui->sourceView->setResource(m_model->resource());
-    //    m_ui->graphicsView->setResource(m_model->resource());
-//}
-
-//void MainWindow::onResourceClosed()
-//{
-    //    m_ui->sourceView->setResource(nullptr);
-    //    m_ui->graphicsView->setResource(nullptr);
-//}
-
 //void MainWindow::onResourceModified()
 //{
     //    m_ui->graphicsView->reloadFromResource();
@@ -150,19 +140,6 @@ void MainWindow::closeEvent(QCloseEvent * event)
 //    errorDialog->showMessage(QString("A Problem occurred: %1").arg(Resource::operationResultString(result)));
 //}
 
-
-//void MainWindow::on_actionSwapViews_triggered()
-//{
-    //    const auto widget0 = m_ui->splitter->widget(0);
-    //    const auto widget1 = m_ui->splitter->widget(1);
-
-    //    const auto sizes = m_ui->splitter->sizes();
-
-    //    m_ui->splitter->insertWidget(0, widget1);
-    //    m_ui->splitter->insertWidget(1, widget0);
-
-    //    m_ui->splitter->setSizes(sizes);
-//}
 
 void MainWindow::on_actionOpenFiles_triggered()
 {
@@ -263,6 +240,23 @@ void MainWindow::on_actionChangeFont_triggered()
     }
 }
 
+void MainWindow::toggleAllSplitterPositionModifiers()
+{
+    m_ui->actionSourceViewToLeftSide->setDisabled(m_ui->actionSourceViewToLeftSide->isEnabled());
+    m_ui->actionSourceViewToRightSide->setDisabled(m_ui->actionSourceViewToRightSide->isEnabled());
+    m_ui->actionGraphicViewToLeftSide->setDisabled(m_ui->actionGraphicViewToLeftSide->isEnabled());
+    m_ui->actionGraphicViewToRightSide->setDisabled(m_ui->actionGraphicViewToRightSide->isEnabled());
+}
+
+void MainWindow::swapCurrentTabSplitterContent()
+{
+    auto widget = m_ui->tabView->currentWidget();
+    if(instanceof<Tab>(widget)) {
+        dynamic_cast<Tab*>(widget)->swapContentPositions();
+        this->toggleAllSplitterPositionModifiers();
+    }
+}
+
 void MainWindow::on_actionAbout_triggered()
 {
     QMessageBox::about(
@@ -285,6 +279,10 @@ void MainWindow::on_tabSelected()
         m_ui->actionSetSyntaxHighlighting->disconnect(SIGNAL(triggered()));
         m_ui->actionSetSyntaxHighlighting->setChecked(tab->sourceView()->hasHighlighting());
         connect(m_ui->actionSetSyntaxHighlighting, &QAction::triggered, tab->sourceView(), &SourceView::setHighlighting);
+
+        if(m_ui->actionGraphicViewToLeftSide->isEnabled() != tab->isDefaultPositioned()) {
+            this->toggleAllSplitterPositionModifiers();
+        }
     } else {
         m_ui->menu_View->setDisabled(true);
     }

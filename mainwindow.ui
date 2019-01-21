@@ -506,9 +506,6 @@
    </property>
   </action>
   <action name="actionGraphicViewToLeftSide">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="text">
     <string>To &amp;Left Side</string>
    </property>
@@ -539,9 +536,6 @@
    </property>
   </action>
   <action name="actionSourceViewToRightSide">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="text">
     <string>To &amp;Right Side</string>
    </property>
