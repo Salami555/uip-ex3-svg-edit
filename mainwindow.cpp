@@ -64,6 +64,16 @@ void MainWindow::updateWindowTitle()
     }
 }
 
+void updateTabName(QTabWidget * tabView, const Tab * tab)
+{
+    // too lazy for good implementation
+    for(int i = 0; i < tabView->count(); ++i) {
+        if(tab == tabView->widget(i)) {
+            tabView->setTabText(i, tab->name());
+        }
+    }
+}
+
 const QMimeDatabase db;
 bool isSVGFile(const QFileInfo & file)
 {
@@ -358,9 +368,11 @@ void MainWindow::on_actionSaveAllFiles_triggered()
     for(int i = 0; i < m_ui->tabView->count(); ++i) {
         auto widget = m_ui->tabView->widget(i);
         if(instanceof<Tab>(widget)) {
-            const Tab *tab = dynamic_cast<const Tab*>(widget);
+            Tab *tab = dynamic_cast<Tab*>(widget);
             if(tab->resource()->isUnsaved()) {
-
+                if(tab->saveFile()) {
+                    updateTabName(m_ui->tabView, tab);
+                }
             }
         }
     }
@@ -499,10 +511,7 @@ void MainWindow::on_modifiedStatusChange()
     if(instanceof<Tab>(widget)) {
         const Tab * tab = dynamic_cast<Tab*>(widget);
         m_ui->actionSaveCurrentFile->setEnabled(tab->resource()->isUnsaved());
-        m_ui->tabView->setTabText(
-            m_ui->tabView->currentIndex(),
-            tab->name()
-        );
+        updateTabName(m_ui->tabView, tab);
         this->updateWindowTitle();
     }
 }
