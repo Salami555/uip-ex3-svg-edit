@@ -24,7 +24,7 @@ void TabModel::newResource()
     assert(m_resource == nullptr);
 
     m_resource = new Resource();
-    auto opResult = m_resource->load(":/picasso-dog");
+    auto opResult = m_resource->load(QFileInfo(":/picasso-dog"));
     if(opResult == ResourceOperationResult::Success) {
         emit resourceOpened();
         return;

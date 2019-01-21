@@ -6,26 +6,43 @@
 
 #include "graphicsview.h"
 #include "sourceview.h"
+#include "resource.h"
 
 
 Tab::Tab(QWidget * parent) : QSplitter(parent)
 {
+    m_resource = new Resource();
+
     auto graphicView = new GraphicsView();
-    this->m_graphicView = graphicView;
+    m_graphicView = graphicView;
     auto sourceView = new SourceView();
-    this->m_sourceView = sourceView;
+    m_sourceView = sourceView;
 
     this->setOrientation(Qt::Orientation::Horizontal);
-    this->addWidget(this->m_sourceView);
-    this->addWidget(this->m_graphicView);
+    this->addWidget(m_sourceView);
+    this->addWidget(m_graphicView);
 }
 
 Tab::~Tab()
 {
-    qDebug() << "closing";
 }
 
-bool Tab::hasPendingChanges() const
+void Tab::loadFile(const QFileInfo& file)
 {
-    return true;
+    auto opResult = m_resource->load(file.absoluteFilePath());
+}
+
+const GraphicsView * Tab::graphicsView() const
+{
+    return m_graphicView;
+}
+
+const SourceView * Tab::sourceView() const
+{
+    return m_sourceView;
+}
+
+const Resource * Tab::resource() const
+{
+    return m_resource;
 }

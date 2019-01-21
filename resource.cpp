@@ -39,14 +39,13 @@ bool Resource::validate() const
     return xmlReader.parse(m_xmlSource.get());
 }
 
-ResourceOperationResult Resource::load(const QString & file)
+ResourceOperationResult Resource::load(const QFileInfo & file)
 {
-    m_fileInfo.setFile(file);
-    if(!m_fileInfo.exists() || !m_fileInfo.isFile()) {
+    if(!file.exists() || !file.isFile()) {
         return ResourceOperationResult::FileNotFound;
     }
 
-    QScopedPointer<QFile> svgFile(new QFile(file));
+    QScopedPointer<QFile> svgFile(new QFile(file.filePath()));
     svgFile->open(QIODevice::ReadOnly | QIODevice::Text);
     if(!svgFile->isOpen()) {
         return ResourceOperationResult::FileOpenFailed;
@@ -59,17 +58,19 @@ ResourceOperationResult Resource::load(const QString & file)
         return ResourceOperationResult::XmlParseFailed;
     }
     m_modified = false;
+
+    m_fileInfo = file;
     return ResourceOperationResult::Success;
 }
 
 ResourceOperationResult Resource::save()
 {
-    return save(m_fileInfo.filePath());
+    return save(m_fileInfo);
 }
 
-ResourceOperationResult Resource::save(const QString & file)
+ResourceOperationResult Resource::save(const QFileInfo & file)
 {
-    QScopedPointer<QFile> svgFile(new QFile(file));
+    QScopedPointer<QFile> svgFile(new QFile(file.filePath()));
     svgFile->open(QIODevice::WriteOnly | QIODevice::Text);
     if(!svgFile->isOpen()) {
         return ResourceOperationResult::FileSaveFailed;
@@ -78,6 +79,7 @@ ResourceOperationResult Resource::save(const QString & file)
     svgFile->write(m_xmlSource->data().toUtf8());
     svgFile->close();
 
+    m_fileInfo = file;
     return ResourceOperationResult::Success;
 }
 
@@ -121,7 +123,17 @@ QGraphicsSvgItem * Resource::graphicsItem()
     return m_graphicsItem.get();
 }
 
-QFileInfo Resource::fileInfo() const
+bool Resource::hasFile() const
+{
+    return m_fileInfo.isFile(); // could use exists
+}
+
+QFileInfo Resource::file() const
 {
     return m_fileInfo;
+}
+
+bool Resource::isUnsaved() const
+{
+    return m_modified;
 }

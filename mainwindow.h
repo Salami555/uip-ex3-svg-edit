@@ -32,7 +32,6 @@ protected:
     virtual void closeEvent(QCloseEvent * event);
 
 private slots:
-    void on_actionExit_triggered();
 //    void onResourceOpenend();
 //    void onResourceClosed();
 //    void onResourceModified();
@@ -40,8 +39,11 @@ private slots:
 //    void onResourceOperationFailed(ResourceOperationResult result);
 
     void on_actionOpenFiles_triggered();
+    void openFiles(const QList<QFileInfo> files);
 
     void on_actionCloseCurrentFile_triggered();
+    void on_actionCloseAllFiles_triggered();
+    void on_actionExit_triggered();
 
     void on_tabSelected();
     void on_tabCloseRequested(int index);
@@ -60,6 +62,4 @@ private slots:
 
 private:
     Ui::MainWindow * m_ui;
-
-    void openFiles(const QList<QFileInfo> files);
 };

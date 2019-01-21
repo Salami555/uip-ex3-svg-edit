@@ -40,15 +40,19 @@ public:
 public:
     explicit Resource();
 
-    ResourceOperationResult load(const QString & file);
+    ResourceOperationResult load(const QFileInfo & file);
     ResourceOperationResult save();
-    ResourceOperationResult save(const QString & file);
+    ResourceOperationResult save(const QFileInfo & file);
 
     ResourceOperationResult setSource(const QString & source);
     QString source() const;
 
     QGraphicsSvgItem * graphicsItem();
-    QFileInfo fileInfo() const;
+
+    bool hasFile() const;
+    QFileInfo file() const;
+
+    bool isUnsaved() const;
 
 protected:
     bool validate() const;

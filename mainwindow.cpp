@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include <QErrorMessage>
 #include <QDropEvent>
+#include <QMimeDatabase>
 #include <QMimeData>
 #include <QMessageBox>
 #include <QDebug>
@@ -25,17 +26,12 @@ MainWindow::MainWindow(QWidget * parent) :
 {
     m_ui->setupUi(this);
 
-    auto newTab = new Tab(m_ui->tabView);
-    m_ui->tabView->addTab(newTab, "Asdf");
     //    m_ui->graphicsView->setFitView(true);
     //    m_ui->sourceView->setHighlighting(true);
     //    m_ui->sourceView->setWordWrap(true);
 
     connect(m_ui->tabView, &QTabWidget::currentChanged, this, &MainWindow::on_tabSelected);
     connect(m_ui->tabView, &QTabWidget::tabCloseRequested, this, &MainWindow::on_tabCloseRequested);
-
-    connect(m_ui->actionExit, &QAction::triggered, this, &MainWindow::on_actionExit_triggered);
-    connect(m_ui->actionCloseCurrentFile, &QAction::triggered, this, &MainWindow::on_actionCloseCurrentFile_triggered);
 
     // connect(m_ui->actionViewSource, SIGNAL(triggered()), this, SLOT(foobar1()));
     // connect(m_ui->actionViewSource, &QAction::triggered,[]() { qDebug() << "test mit lambda"; });
@@ -56,7 +52,7 @@ bool confirmDiscardingUnsavedChanges(QWidget *parent)
 {
     auto reply = QMessageBox::question(
         parent,
-        "File not saved",
+        "Unsaved files",
         "Do you want to discard the current changes?",
         QMessageBox::Yes|QMessageBox::No
     );
@@ -64,37 +60,36 @@ bool confirmDiscardingUnsavedChanges(QWidget *parent)
 }
 
 
-// ----- Control -----------------------------------------------
-void MainWindow::openFiles(const QList<QFileInfo> files)
+// ----- Events -----------------------------------------------
+const QMimeDatabase db;
+QList<QFileInfo> filterSVGFiles(const QList<QUrl> & fileURLs)
 {
-    for(auto c : files) {
-        qDebug() << c;
-    }
-    for(int i = 0; i < m_ui->tabView->count(); ++i) {
-        auto tab = m_ui->tabView->widget(i);
-        if(instanceof<Tab>(tab)) {
-            qDebug() << tab;
+    QList<QFileInfo> files;
+    for(QUrl url : fileURLs) {
+        auto file = QFileInfo(url.toLocalFile());
+        auto mimeType = db.mimeTypeForFile(file);
+        if(mimeType.name() == "image/svg+xml") {
+            files.append(file);
         }
     }
+    return files;
 }
 
-
-// ----- Events -----------------------------------------------
 void MainWindow::dragEnterEvent(QDragEnterEvent *event)
 {
-    if (event->mimeData()->hasUrls())
-        event->acceptProposedAction();
+    const QMimeData* mimeData = event->mimeData();
+    if (mimeData->hasUrls()) {
+        if(!filterSVGFiles(mimeData->urls()).isEmpty()) {
+            event->acceptProposedAction();
+        }
+    }
 }
 
 void MainWindow::dropEvent(QDropEvent * event)
 {
     const QMimeData* mimeData = event->mimeData();
     if (mimeData->hasUrls()) {
-        QList<QFileInfo> files;
-        for(QUrl url : mimeData->urls()) {
-            files.append(QFileInfo(url.toLocalFile()));
-        }
-        this->openFiles(files);
+        this->openFiles(filterSVGFiles(mimeData->urls()));
     }
 }
 
@@ -107,8 +102,6 @@ void MainWindow::showEvent(QShowEvent * event)
         files.append(QFileInfo(args[i]));
     }
     this->openFiles(files);
-
-    m_ui->actionCloseCurrentFile->setDisabled(true);
 }
 
 bool isEveryFileSaved(const QTabWidget * tabView)
@@ -117,7 +110,7 @@ bool isEveryFileSaved(const QTabWidget * tabView)
         auto widget = tabView->widget(i);
         if(instanceof<Tab>(widget)) {
             const Tab *tab = dynamic_cast<const Tab*>(widget);
-            if(tab->hasPendingChanges()) {
+            if(tab->resource()->isUnsaved()) {
                 return false;
             }
         }
@@ -133,7 +126,7 @@ void MainWindow::closeEvent(QCloseEvent * event)
             return;
         }
     }
-    m_ui->actionExit->trigger();
+    qApp->exit();
 }
 
 
@@ -179,14 +172,10 @@ void MainWindow::closeEvent(QCloseEvent * event)
     //    m_ui->splitter->setSizes(sizes);
 //}
 
-void MainWindow::on_actionExit_triggered()
-{
-    qApp->exit();
-}
-
 void MainWindow::on_actionOpenFiles_triggered()
 {
     auto dialog = new QFileDialog(this);
+    dialog->setWindowModality(Qt::WindowModality::ApplicationModal);
     dialog->setFileMode(QFileDialog::ExistingFiles);
     dialog->setViewMode(QFileDialog::Detail);
     dialog->setAcceptMode(QFileDialog::AcceptOpen);
@@ -194,12 +183,79 @@ void MainWindow::on_actionOpenFiles_triggered()
     dialog->setMimeTypeFilters({ "image/svg+xml" });
     dialog->setNameFilter("Scalable Vector Graphic Files (*.svg);; All Files (*.*)");
 
-    dialog->open(const_cast<MainWindow *>(this), SLOT(openResources(const QStringList &)));
+    if(dialog->exec()) {
+        QList<QFileInfo> files;
+        for(auto filename : dialog->selectedFiles()) {
+            files.append(QFileInfo(filename));
+        }
+        this->openFiles(files);
+    }
+}
+
+bool isFileOpened(const QTabWidget * tabs, QFileInfo &file)
+{
+    for(int i = 0; i < tabs->count(); ++i) {
+        auto widget = tabs->widget(i);
+        if(instanceof<Tab>(widget)) {
+            const Tab *tab = dynamic_cast<const Tab*>(widget);
+            const Resource *res = tab->resource();
+            if(!res->hasFile()) {
+                continue;
+            }
+            if(res->file() == file) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+void MainWindow::openFiles(const QList<QFileInfo> files)
+{
+    for(auto file : files) {
+        if(isFileOpened(m_ui->tabView, file)) {
+            continue;
+        }
+
+        auto newTab = new Tab(m_ui->tabView);
+        newTab->loadFile(file);
+        m_ui->tabView->addTab(newTab, file.baseName());
+    }
 }
 
 void MainWindow::on_actionCloseCurrentFile_triggered()
 {
     this->on_tabCloseRequested(m_ui->tabView->currentIndex());
+}
+
+void MainWindow::on_actionCloseAllFiles_triggered()
+{
+    bool closeConfirmed = false;
+    if(!isEveryFileSaved(m_ui->tabView)) {
+        closeConfirmed = confirmDiscardingUnsavedChanges(this);
+    }
+
+    for(int i = 0; i < m_ui->tabView->count(); ++i) {
+        auto widget = m_ui->tabView->widget(i);
+        if(instanceof<Tab>(widget)) {
+            const Tab *tab = dynamic_cast<const Tab*>(widget);
+            if(!tab->resource()->isUnsaved() || closeConfirmed) {
+                m_ui->tabView->removeTab(i--);
+            }
+        } else {
+            m_ui->tabView->removeTab(i--);
+        }
+    }
+}
+
+void MainWindow::on_actionExit_triggered()
+{
+    if(!isEveryFileSaved(m_ui->tabView)) {
+        if(!confirmDiscardingUnsavedChanges(this)) {
+            return;
+        }
+    }
+    qApp->exit();
 }
 
 void MainWindow::on_tabSelected()
@@ -214,7 +270,7 @@ void MainWindow::on_tabCloseRequested(int index)
     auto widget = m_ui->tabView->widget(index);
     if(instanceof<Tab>(widget)) {
         const Tab *tab = dynamic_cast<const Tab*>(widget);
-        if(tab->hasPendingChanges()) {
+        if(tab->resource()->isUnsaved()) {
             if(!confirmDiscardingUnsavedChanges((QWidget *)tab)) {
                 return;
             }
