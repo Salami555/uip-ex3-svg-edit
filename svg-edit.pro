@@ -31,8 +31,7 @@ SOURCES += \
     resource.cpp \
     sourceview.cpp \
     highlighter.cpp \
-    tab.cpp \
-    tabmodel.cpp
+    tab.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -40,8 +39,7 @@ HEADERS += \
     resource.h \
     sourceview.h \
     highlighter.h \
-    tab.h \
-    tabmodel.h
+    tab.h
 
 FORMS += \
     mainwindow.ui
