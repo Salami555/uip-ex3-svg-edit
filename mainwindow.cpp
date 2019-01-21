@@ -25,20 +25,11 @@ MainWindow::MainWindow(QWidget * parent) :
     m_ui(new Ui::MainWindow)
 {
     m_ui->setupUi(this);
-
-    //    m_ui->graphicsView->setFitView(true);
-    //    m_ui->sourceView->setHighlighting(true);
-    //    m_ui->sourceView->setWordWrap(true);
+    QSettings::setDefaultFormat(QSettings::IniFormat);
+    m_settings = new QSettings();
 
     connect(m_ui->tabView, &QTabWidget::currentChanged, this, &MainWindow::on_tabSelected);
     connect(m_ui->tabView, &QTabWidget::tabCloseRequested, this, &MainWindow::on_tabCloseRequested);
-
-    // connect(m_ui->actionViewSource, SIGNAL(triggered()), this, SLOT(foobar1()));
-    // connect(m_ui->actionViewSource, &QAction::triggered,[]() { qDebug() << "test mit lambda"; });
-    // connect(m_ui->actionSelectAll, &QAction::triggered, m_ui->sourceView, &SourceView::selectAll);
-
-    //    connect(m_ui->actionSyntaxHighlighting, &QAction::triggered, m_ui->sourceView, &SourceView::setHighlighting);
-    //    connect(m_ui->actionWordWrap, &QAction::triggered, m_ui->sourceView, &SourceView::setWordWrap);
 }
 
 
@@ -182,9 +173,12 @@ void MainWindow::on_actionOpenFiles_triggered()
 
     dialog->setMimeTypeFilters({ "image/svg+xml" });
     dialog->setNameFilter("Scalable Vector Graphic Files (*.svg);; All Files (*.*)");
+    dialog->setDirectory(m_settings->value("last_open_directory", ".").toString());
 
     if(dialog->exec()) {
         QList<QFileInfo> files;
+        m_settings->setValue("last_open_directory", dialog->directory().path());
+        qDebug() << dialog->directory().path();
         for(auto filename : dialog->selectedFiles()) {
             files.append(QFileInfo(filename));
         }

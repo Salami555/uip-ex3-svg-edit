@@ -2,6 +2,7 @@
 
 #include <QMainWindow>
 #include <QFileInfo>
+#include <QSettings>
 
 class GraphicsView;
 class SourceView;
@@ -62,4 +63,6 @@ private slots:
 
 private:
     Ui::MainWindow * m_ui;
+
+    QSettings * m_settings;
 };
