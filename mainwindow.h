@@ -22,6 +22,9 @@ public:
     explicit MainWindow(QWidget * parent = nullptr);
 
 protected:
+    void addRecentFile(const QFileInfo & file);
+    void restoreRecentFileList();
+    void updateRecentFileMenuList(const QList<QFileInfo> & files);
     void updateWindowTitle();
     void addTab(Tab * tab);
     void openFiles(const QList<QFileInfo> files);

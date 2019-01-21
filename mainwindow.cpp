@@ -148,7 +148,8 @@ QList<QFileInfo> preprocessFileList(const QList<QFileInfo> & files)
 }
 
 
-// --- Settings -----------------------------------------------
+// --- State / Settings -----------------------------------------------
+const short SETTING_MAX_RECENT_FILES_COUNT = 10;
 const QString SETTING_RECENT_FILES = "last_state/used_files";
 const QString SETTING_LAST_OPEN_PATH = "last_state/directories/open";
 const QString SETTING_LAST_SAVE_PATH = "last_state/directories/save";
@@ -168,6 +169,47 @@ void setFontIfExists(QSettings * settings, SourceView * sourceView, const QStrin
         font.fromString(settings->value(key).toString());
         sourceView->setFont(font);
     }
+}
+
+void MainWindow::updateRecentFileMenuList(const QList<QFileInfo> & files)
+{
+    if(files.isEmpty()) {
+        m_ui->menu_RecentlyUsedFiles->setDisabled(true);
+        return;
+    }
+    m_ui->menu_RecentlyUsedFiles->setEnabled(true);
+    m_ui->menu_RecentlyUsedFiles->clear();
+    for(auto file : files) {
+        auto recentFileAction = new QAction(file.fileName(), m_ui->menu_RecentlyUsedFiles);
+        recentFileAction->setEnabled(file.exists());
+
+        recentFileAction->connect(recentFileAction, &QAction::triggered, this, [this, file]() {
+            this->openFiles({file});
+        });
+        m_ui->menu_RecentlyUsedFiles->addAction(recentFileAction);
+    }
+}
+
+void MainWindow::addRecentFile(const QFileInfo & file)
+{
+    auto filename = file.absoluteFilePath();
+    auto filenames = m_settings->value(SETTING_RECENT_FILES).toStringList();
+    int index = filenames.indexOf(filename);
+    if(index >= 0) {
+        filenames.removeAt(index);
+    } else if(filenames.size() >= SETTING_MAX_RECENT_FILES_COUNT) {
+        filenames.removeLast();
+    }
+    filenames.push_front(filename);
+    m_settings->setValue(SETTING_RECENT_FILES, filenames);
+
+    this->updateRecentFileMenuList(names2fileinfos(filenames));
+}
+
+void MainWindow::restoreRecentFileList()
+{
+    auto filenames = m_settings->value(SETTING_RECENT_FILES).toStringList();
+    this->updateRecentFileMenuList(names2fileinfos(filenames));
 }
 
 QString lastDirectoryOpenPath(const QSettings * settings)
@@ -225,6 +267,7 @@ void MainWindow::showEvent(QShowEvent * event)
     qApp->setApplicationDisplayName(qApp->applicationName());
     this->setWindowTitle(qApp->applicationName());
 
+    this->restoreRecentFileList();
     openWelcomeTab(m_ui->tabView);
 
     QStringList args(qApp->arguments());
@@ -303,6 +346,7 @@ void MainWindow::addTab(Tab * tab)
     m_ui->tabView->addTab(tab, tab->name());
     m_ui->actionSaveCurrentFile->setDisabled(true);
     connect(tab->resource(), &Resource::changed, this, &MainWindow::on_modifiedStatusChange);
+    this->addRecentFile(tab->resource()->file());
 }
 
 void MainWindow::openFiles(const QList<QFileInfo> files)
@@ -498,6 +542,7 @@ void MainWindow::on_tabCloseRequested(int index)
                 return;
             }
         }
+        this->addRecentFile(tab->resource()->file());
     }
 
     m_ui->tabView->removeTab(index);
