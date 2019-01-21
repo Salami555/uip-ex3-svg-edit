@@ -137,7 +137,8 @@ QList<QFileInfo> preprocessFileList(const QList<QFileInfo> & files)
     return filterSVGFiles(directoryExtractor(filterExistingPaths(files)));
 }
 
-// --- Settings
+
+// --- Settings -----------------------------------------------
 const QString SETTING_RECENT_FILES = "last_state/used_files";
 const QString SETTING_LAST_DIRECTORY_OPEN = "last_state/directories/open";
 const QString SETTING_LAST_DIRECTORY_SAVE = "last_state/directories/save";
@@ -233,19 +234,6 @@ void MainWindow::closeEvent(QCloseEvent * event)
 
 
 // ----- SLOTS -----------------------------------------------
-//void MainWindow::onResourceModified()
-//{
-    //    m_ui->graphicsView->reloadFromResource();
-    //m_ui->graphicsView->setResource(m_model->resource());
-//}
-
-//void MainWindow::onResourceOperationFailed(const ResourceOperationResult result)
-//{
-//    auto errorDialog = new QErrorMessage(this);
-//    errorDialog->showMessage(QString("A Problem occurred: %1").arg(Resource::operationResultString(result)));
-//}
-
-
 void MainWindow::on_actionOpenFiles_triggered()
 {
     auto dialog = new QFileDialog(this);
@@ -460,10 +448,6 @@ void MainWindow::on_tabCloseRequested(int index)
     }
 
     m_ui->tabView->removeTab(index);
-
-//    if(m_ui->tabView->count() == 0) {
-//        m_ui->actionExit->trigger();
-//    }
 }
 
 void MainWindow::on_modifiedStatusChange()

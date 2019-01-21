@@ -36,12 +36,6 @@ protected:
     virtual void closeEvent(QCloseEvent * event);
 
 private slots:
-//    void onResourceOpenend();
-//    void onResourceClosed();
-//    void onResourceModified();
-
-//    void onResourceOperationFailed(ResourceOperationResult result);
-
     // menu trigger
     void on_actionOpenFiles_triggered();
     void on_actionSaveCurrentFile_triggered();
