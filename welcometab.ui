@@ -40,15 +40,15 @@
 &lt;p&gt;Edit your SVG files with pain and seizures.&lt;/p&gt;
 &lt;p&gt;Use the file menu to open your SVG files&lt;br/&gt;or drop them into the application window to load them!&lt;/p&gt;
 &lt;hr/&gt;
-&lt;h2&gt;Features (in order of implementation)&lt;/h2&gt;
+&lt;h2&gt;Features (ordered by implementation time)&lt;/h2&gt;
 &lt;ol&gt;
 &lt;li&gt;open files via command line&lt;/li&gt;
 &lt;li&gt;open files via &quot;open with&quot; menu&lt;/li&gt;
 &lt;li&gt;open files via drag'n'drop&lt;/li&gt;
 &lt;li&gt;does not open files multiple times&lt;/li&gt;
-&lt;li&gt;tabs are closable!&lt;/li&gt;
 &lt;li&gt;fancy Win98 theme&lt;/li&gt;
-&lt;li&gt;close tabs all at once!&lt;/li&gt;
+&lt;li&gt;about window&lt;/li&gt;
+&lt;li&gt;closable tabs and close them all at once!&lt;/li&gt;
 &lt;li&gt;opening files filters for svg files only!&lt;/li&gt;
 &lt;li&gt;remembers last open/save directory&lt;/li&gt;
 &lt;li&gt;remembers last tab settings for highlighting, line wrap and fonts&lt;/li&gt;
@@ -56,9 +56,11 @@
 &lt;li&gt;swap your source and graphic view around&lt;/li&gt;
 &lt;li&gt;graphics updates when having valid source!&lt;/li&gt;
 &lt;li&gt;new tabs get automatically selected!&lt;/li&gt;
-&lt;li&gt;modified indicators&lt;/li&gt;
+&lt;li&gt;menu disables currently (context specific) unusable functionality on tab basis&lt;/li&gt;
+&lt;li&gt;modified indicators (tab and window title)&lt;/li&gt;
 &lt;li&gt;opening directories searches containing svg files (not recursive)&lt;/li&gt;
 &lt;li&gt;reopen this welcome tab (idk why)&lt;/li&gt;
+&lt;li&gt;save, save as and save all!&lt;/li&gt;
 &lt;/ol&gt;
 &lt;/body&gt;
 &lt;/html&gt;</string>
