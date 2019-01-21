@@ -3,7 +3,7 @@
 #include "ui_mainwindow.h"
 
 #include <QActionGroup>
-#include <QSplitter>
+#include <QtUiTools>
 #include <QFileDialog>
 #include <QErrorMessage>
 #include <QDropEvent>
@@ -181,11 +181,25 @@ void MainWindow::dropEvent(QDropEvent * event)
     }
 }
 
+void openWelcomeTab(QTabWidget * tabView)
+{
+    QUiLoader loader;
+    QFile file(":tab-welcome");
+    file.open(QFile::ReadOnly);
+    QWidget * tab = loader.load(&file, tabView);
+    file.close();
+    tabView->insertTab(0, tab, "Welcome");
+    tabView->setCurrentIndex(0);
+}
+
 void MainWindow::showEvent(QShowEvent * event)
 {
     QMainWindow::showEvent(event);
     qApp->setApplicationDisplayName(qApp->applicationName());
     this->setWindowTitle(qApp->applicationName());
+
+    openWelcomeTab(m_ui->tabView);
+
     QStringList args(qApp->arguments());
     args.removeFirst();
     auto files = preprocessFileList(names2fileinfos(args));
@@ -242,7 +256,10 @@ void MainWindow::on_actionOpenFiles_triggered()
 
     dialog->setMimeTypeFilters({ "image/svg+xml" });
     dialog->setNameFilter("Scalable Vector Graphic Files (*.svg);; All Files (*.*)");
-    dialog->setDirectory(m_settings->value(SETTING_LAST_DIRECTORY_OPEN, ".").toString());
+    dialog->setDirectory(m_settings->value(
+        SETTING_LAST_DIRECTORY_OPEN,
+        QFileInfo("./").absoluteFilePath()
+    ).toString());
 
     if(dialog->exec()) {
         m_settings->setValue(SETTING_LAST_DIRECTORY_OPEN, dialog->directory().path());
@@ -388,6 +405,11 @@ void MainWindow::swapCurrentTabSplitterContent()
         dynamic_cast<Tab*>(widget)->swapContentPositions();
         this->toggleAllSplitterPositionModifiers();
     }
+}
+
+void MainWindow::on_actionWelcomeTab_triggered()
+{
+    openWelcomeTab(m_ui->tabView);
 }
 
 void MainWindow::on_actionAbout_triggered()

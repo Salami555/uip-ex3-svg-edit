@@ -53,6 +53,7 @@ private slots:
 
     void on_actionChangeFont_triggered();
 
+    void on_actionWelcomeTab_triggered();
     void on_actionAbout_triggered();
 
     // generic

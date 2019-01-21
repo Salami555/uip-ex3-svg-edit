@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file alias="picasso-dog">picassodog.svg</file>
         <file alias="ps-background">ps-background.png</file>
+        <file alias="tab-welcome">welcometab.ui</file>
     </qresource>
 </RCC>

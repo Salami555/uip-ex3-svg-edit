@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui svg xml
+QT += core gui svg xml uitools
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -42,7 +42,8 @@ HEADERS += \
     tab.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    welcometab.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
