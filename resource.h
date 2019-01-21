@@ -58,6 +58,7 @@ protected:
     bool validate() const;
 
 signals:
+    void changed();
 
 public slots:
 

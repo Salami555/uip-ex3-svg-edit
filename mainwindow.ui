@@ -145,6 +145,9 @@
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menu_Edit">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="title">
      <string>&amp;Edit</string>
     </property>
@@ -244,9 +247,6 @@
    </property>
   </action>
   <action name="actionSaveCurrentFile">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="text">
     <string>&amp;Save</string>
    </property>
@@ -258,9 +258,6 @@
    </property>
   </action>
   <action name="actionSaveCurrentFileAs">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="text">
     <string>Save &amp;As...</string>
    </property>
@@ -272,9 +269,6 @@
    </property>
   </action>
   <action name="actionSaveAllFiles">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="text">
     <string>Sav&amp;e All</string>
    </property>

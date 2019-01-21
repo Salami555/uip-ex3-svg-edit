@@ -1,6 +1,6 @@
 #include "tab.h"
 
-#include <QLayout>
+#include <QTabWidget>
 #include <QMessageBox>
 #include <QDebug>
 
@@ -23,7 +23,7 @@ Tab::Tab(QWidget * parent) : QSplitter(parent)
     this->addWidget(m_sourceView);
     this->addWidget(m_graphicView);
 
-    connect(m_sourceView, &SourceView::sourceChanged, this, &Tab::tryGraphicUpdate);
+    connect(m_sourceView, &SourceView::sourceChanged, this, &Tab::sourceChanged);
 }
 
 Tab::~Tab()
@@ -43,11 +43,24 @@ bool Tab::loadFile(const QFileInfo& file)
     }
 }
 
-void Tab::tryGraphicUpdate()
+bool Tab::saveFile()
+{
+    auto result = m_resource->save();
+    if(result == ResourceOperationResult::Success) {
+        this->setWindowModified(false);
+        return true;
+    } else {
+        QMessageBox::critical(this, "File saving failed", "Error code: " + Resource::operationResultString(result));
+        return false;
+    }
+}
+
+void Tab::sourceChanged()
 {
     auto result = m_resource->setSource(m_sourceView->source());
     if(result == ResourceOperationResult::Success) {
         m_graphicView->reloadFromResource();
+        this->setWindowModified(true);
     }
 }
 
@@ -70,6 +83,17 @@ void Tab::swapContentPositions(bool restoreSize)
 bool Tab::isDefaultPositioned() const
 {
     return m_defaultPositioned;
+}
+
+QString Tab::name(bool windowTitleReady) const
+{
+    QString name(m_resource->file().baseName());
+    if(windowTitleReady) {
+        name += "[*]";
+    } else if(m_resource->isUnsaved()) {
+        name += "*";
+    }
+    return name;
 }
 
 GraphicsView * Tab::graphicsView() const

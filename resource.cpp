@@ -79,6 +79,7 @@ ResourceOperationResult Resource::save(const QFileInfo & file)
     svgFile->write(m_xmlSource->data().toUtf8());
     svgFile->close();
 
+    m_modified = false;
     m_fileInfo = file;
     return ResourceOperationResult::Success;
 }
@@ -95,6 +96,7 @@ ResourceOperationResult Resource::setSource(const QString & source)
     if(!validate()) {
         return ResourceOperationResult::XmlParseFailed;
     }
+    emit changed();
     return ResourceOperationResult::Success;
 }
 

@@ -57,6 +57,14 @@ bool confirmDiscardingUnsavedChanges(QWidget *parent)
     return reply == QMessageBox::Yes;
 }
 
+void MainWindow::updateWindowTitle()
+{
+    auto widget = m_ui->tabView->currentWidget();
+    if(instanceof<Tab>(widget)) {
+        this->setWindowTitle(dynamic_cast<Tab*>(widget)->name());
+    }
+}
+
 
 // ----- Events -----------------------------------------------
 const QMimeDatabase db;
@@ -94,6 +102,8 @@ void MainWindow::dropEvent(QDropEvent * event)
 void MainWindow::showEvent(QShowEvent * event)
 {
     QMainWindow::showEvent(event);
+    qApp->setApplicationDisplayName(qApp->applicationName());
+    this->setWindowTitle(qApp->applicationName());
     QStringList args = qApp->arguments();
     QList<QFileInfo> files;
     for(short i = 1; i < args.size(); i++) {
@@ -194,12 +204,44 @@ void MainWindow::openFiles(const QList<QFileInfo> files)
         auto newTab = new Tab(m_ui->tabView);
         if(newTab->loadFile(file)) {
             m_ui->tabView->addTab(newTab, file.baseName());
+            connect(newTab->resource(), &Resource::changed, this, &MainWindow::on_modifiedStatusChange);
             tabAdded = true;
         }
     }
     if(tabAdded) {
         m_ui->tabView->setCurrentIndex(newTabIndex);
     }
+}
+
+void MainWindow::on_actionSaveCurrentFile_triggered()
+{
+    auto widget = m_ui->tabView->currentWidget();
+    if(instanceof<Tab>(widget)) {
+        Tab *tab = dynamic_cast<Tab*>(widget);
+        if(tab->saveFile()) {
+            this->on_modifiedStatusChange();
+        }
+    }
+}
+
+void MainWindow::on_actionSaveCurrentFileAs_triggered()
+{
+
+}
+
+void MainWindow::on_actionSaveAllFiles_triggered()
+{
+    for(int i = 0; i < m_ui->tabView->count(); ++i) {
+        auto widget = m_ui->tabView->widget(i);
+        if(instanceof<Tab>(widget)) {
+            const Tab *tab = dynamic_cast<const Tab*>(widget);
+            if(tab->resource()->isUnsaved()) {
+
+            }
+        }
+    }
+    this->setWindowModified(false);
+    this->on_modifiedStatusChange();
 }
 
 void MainWindow::on_actionCloseCurrentFile_triggered()
@@ -276,8 +318,10 @@ void MainWindow::on_tabSelected()
 {
     auto widget = m_ui->tabView->currentWidget();
     if(instanceof<Tab>(widget)) {
+        m_ui->menu_Edit->setEnabled(true);
         m_ui->menu_View->setEnabled(true);
         const Tab *tab = dynamic_cast<const Tab*>(widget);
+        this->updateWindowTitle();
 
         m_ui->actionSetLineWrap->disconnect(SIGNAL(triggered()));
         m_ui->actionSetLineWrap->setChecked(tab->sourceView()->hasWordWrap());
@@ -291,7 +335,9 @@ void MainWindow::on_tabSelected()
             this->toggleAllSplitterPositionModifiers();
         }
     } else {
+        m_ui->menu_Edit->setDisabled(true);
         m_ui->menu_View->setDisabled(true);
+        this->setWindowTitle(qApp->applicationName());
     }
 }
 
@@ -299,9 +345,9 @@ void MainWindow::on_tabCloseRequested(int index)
 {
     auto widget = m_ui->tabView->widget(index);
     if(instanceof<Tab>(widget)) {
-        const Tab *tab = dynamic_cast<const Tab*>(widget);
+        Tab *tab = dynamic_cast<Tab*>(widget);
         if(tab->resource()->isUnsaved()) {
-            if(!confirmDiscardingUnsavedChanges((QWidget *)tab)) {
+            if(!confirmDiscardingUnsavedChanges(dynamic_cast<QWidget *>(tab))) {
                 return;
             }
         }
@@ -312,6 +358,19 @@ void MainWindow::on_tabCloseRequested(int index)
 //    if(m_ui->tabView->count() == 0) {
 //        m_ui->actionExit->trigger();
 //    }
+}
+
+void MainWindow::on_modifiedStatusChange()
+{
+    auto widget = m_ui->tabView->currentWidget();
+    if(instanceof<Tab>(widget)) {
+        QString name = dynamic_cast<Tab*>(widget)->name();
+        m_ui->tabView->setTabText(
+            m_ui->tabView->currentIndex(),
+            name
+        );
+        this->updateWindowTitle();
+    }
 }
 
 //void MainWindow::on_actionFitView_toggled(bool enabled) const

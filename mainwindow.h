@@ -23,6 +23,7 @@ public:
     explicit MainWindow(QWidget * parent = nullptr);
 
 protected:
+    void updateWindowTitle();
     void openFiles(const QList<QFileInfo> files);
 
     void toggleAllSplitterPositionModifiers();
@@ -43,7 +44,9 @@ private slots:
 
     // menu trigger
     void on_actionOpenFiles_triggered();
-
+    void on_actionSaveCurrentFile_triggered();
+    void on_actionSaveCurrentFileAs_triggered();
+    void on_actionSaveAllFiles_triggered();
     void on_actionCloseCurrentFile_triggered();
     void on_actionCloseAllFiles_triggered();
     void on_actionExit_triggered();
@@ -55,6 +58,7 @@ private slots:
     // generic
     void on_tabSelected();
     void on_tabCloseRequested(int index);
+    void on_modifiedStatusChange();
 
 private:
     Ui::MainWindow * m_ui;

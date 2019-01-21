@@ -18,11 +18,15 @@ public:
     ~Tab();
 
     bool loadFile(const QFileInfo& file);
+    bool saveFile();
+    bool saveFileAs(const QFileInfo& file);
 
-    void tryGraphicUpdate();
+    void sourceChanged();
 
     void swapContentPositions(bool restoreSize = true);
     bool isDefaultPositioned() const;
+
+    QString name(bool windowTitleReady = false) const;
 
     GraphicsView * graphicsView() const;
     SourceView * sourceView() const;
