@@ -13,7 +13,6 @@
 #include <QFontDialog>
 #include <QDebug>
 
-// #include "tabmodel.h"
 #include "resource.h"
 
 #include "tab.h"
@@ -65,8 +64,6 @@ void MainWindow::updateWindowTitle()
     }
 }
 
-
-// ----- Events -----------------------------------------------
 const QMimeDatabase db;
 QList<QFileInfo> filterSVGFiles(const QList<QUrl> & fileURLs)
 {
@@ -81,6 +78,29 @@ QList<QFileInfo> filterSVGFiles(const QList<QUrl> & fileURLs)
     return files;
 }
 
+// --- Settings
+const QString SETTING_LAST_DIRECTORY_OPEN = "last_directory/open";
+const QString SETTING_LAST_DIRECTORY_SAVE = "last_directory/save";
+const QString SETTING_STYLE_DEFAULT_FONT = "style/default_font";
+const QString SETTING_STYLE_WORD_WRAP = "style/word_wrap";
+const QString SETTING_STYLE_HIGHLIGHTING = "style/highlighting";
+
+void saveDefaultFont(QSettings * settings, const QFont & font, const QString & key = SETTING_STYLE_DEFAULT_FONT)
+{
+    settings->setValue(key, font.toString());
+}
+
+void setFontIfExists(QSettings * settings, SourceView * sourceView, const QString & key = SETTING_STYLE_DEFAULT_FONT)
+{
+    if(settings->contains(key)) {
+        QFont font;
+        font.fromString(settings->value(key).toString());
+        sourceView->setFont(font);
+    }
+}
+
+
+// ----- Events -----------------------------------------------
 void MainWindow::dragEnterEvent(QDragEnterEvent *event)
 {
     const QMimeData* mimeData = event->mimeData();
@@ -162,11 +182,11 @@ void MainWindow::on_actionOpenFiles_triggered()
 
     dialog->setMimeTypeFilters({ "image/svg+xml" });
     dialog->setNameFilter("Scalable Vector Graphic Files (*.svg);; All Files (*.*)");
-    dialog->setDirectory(m_settings->value("last_open_directory", ".").toString());
+    dialog->setDirectory(m_settings->value(SETTING_LAST_DIRECTORY_OPEN, ".").toString());
 
     if(dialog->exec()) {
         QList<QFileInfo> files;
-        m_settings->setValue("last_open_directory", dialog->directory().path());
+        m_settings->setValue(SETTING_LAST_DIRECTORY_OPEN, dialog->directory().path());
         for(auto filename : dialog->selectedFiles()) {
             files.append(QFileInfo(filename));
         }
@@ -203,6 +223,7 @@ void MainWindow::openFiles(const QList<QFileInfo> files)
 
         auto newTab = new Tab(m_ui->tabView);
         if(newTab->loadFile(file)) {
+            setFontIfExists(m_settings, newTab->sourceView());
             m_ui->tabView->addTab(newTab, file.baseName());
             connect(newTab->resource(), &Resource::changed, this, &MainWindow::on_modifiedStatusChange);
             tabAdded = true;
@@ -285,6 +306,7 @@ void MainWindow::on_actionChangeFont_triggered()
     QFontDialog fontChooser(tab->sourceView()->font(), this);
     fontChooser.setOption(QFontDialog::MonospacedFonts);
     if(fontChooser.exec()) {
+        saveDefaultFont(m_settings, fontChooser.selectedFont());
         tab->sourceView()->setFont(fontChooser.selectedFont());
     }
 }
