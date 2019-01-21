@@ -219,6 +219,9 @@
    </property>
   </action>
   <action name="actionSaveAllFiles">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Sav&amp;e All</string>
    </property>

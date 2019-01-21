@@ -464,7 +464,6 @@ void MainWindow::on_tabSelected()
 
         m_ui->actionSaveCurrentFile->setEnabled(tab->resource()->isUnsaved());
         m_ui->actionSaveCurrentFileAs->setEnabled(true);
-        m_ui->actionSaveAllFiles->setEnabled(true);
         m_ui->menu_Edit->setEnabled(true);
         m_ui->menu_View->setEnabled(true);
         this->updateWindowTitle();
@@ -483,7 +482,6 @@ void MainWindow::on_tabSelected()
     } else {
         m_ui->actionSaveCurrentFile->setDisabled(true);
         m_ui->actionSaveCurrentFileAs->setDisabled(true);
-        m_ui->actionSaveAllFiles->setDisabled(true);
         m_ui->menu_Edit->setDisabled(true);
         m_ui->menu_View->setDisabled(true);
         this->setWindowTitle(qApp->applicationName());
@@ -503,6 +501,7 @@ void MainWindow::on_tabCloseRequested(int index)
     }
 
     m_ui->tabView->removeTab(index);
+    this->on_modifiedStatusChange();
 }
 
 void MainWindow::on_modifiedStatusChange()
@@ -514,6 +513,7 @@ void MainWindow::on_modifiedStatusChange()
         updateTabName(m_ui->tabView, tab);
         this->updateWindowTitle();
     }
+    m_ui->actionSaveAllFiles->setDisabled(isEveryFileSaved(m_ui->tabView));
 }
 
 //void MainWindow::on_actionFitView_toggled(bool enabled) const
