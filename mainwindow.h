@@ -41,6 +41,9 @@ private slots:
 
     void on_actionOpenFiles_triggered();
 
+    void on_actionCloseCurrentFile_triggered();
+
+    void on_tabSelected();
     void on_tabCloseRequested(int index);
 
 //    void on_actionSwapViews_triggered();

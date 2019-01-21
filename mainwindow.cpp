@@ -31,8 +31,11 @@ MainWindow::MainWindow(QWidget * parent) :
     //    m_ui->sourceView->setHighlighting(true);
     //    m_ui->sourceView->setWordWrap(true);
 
+    connect(m_ui->tabView, &QTabWidget::currentChanged, this, &MainWindow::on_tabSelected);
     connect(m_ui->tabView, &QTabWidget::tabCloseRequested, this, &MainWindow::on_tabCloseRequested);
+
     connect(m_ui->actionExit, &QAction::triggered, this, &MainWindow::on_actionExit_triggered);
+    connect(m_ui->actionCloseCurrentFile, &QAction::triggered, this, &MainWindow::on_actionCloseCurrentFile_triggered);
 
     // connect(m_ui->actionViewSource, SIGNAL(triggered()), this, SLOT(foobar1()));
     // connect(m_ui->actionViewSource, &QAction::triggered,[]() { qDebug() << "test mit lambda"; });
@@ -104,6 +107,8 @@ void MainWindow::showEvent(QShowEvent * event)
         files.append(QFileInfo(args[i]));
     }
     this->openFiles(files);
+
+    m_ui->actionCloseCurrentFile->setDisabled(true);
 }
 
 bool isEveryFileSaved(const QTabWidget * tabView)
@@ -192,6 +197,18 @@ void MainWindow::on_actionOpenFiles_triggered()
     dialog->open(const_cast<MainWindow *>(this), SLOT(openResources(const QStringList &)));
 }
 
+void MainWindow::on_actionCloseCurrentFile_triggered()
+{
+    this->on_tabCloseRequested(m_ui->tabView->currentIndex());
+}
+
+void MainWindow::on_tabSelected()
+{
+    auto widget = m_ui->tabView->currentWidget();
+    bool isFileTab = instanceof<Tab>(widget);
+    m_ui->actionCloseCurrentFile->setEnabled(isFileTab);
+}
+
 void MainWindow::on_tabCloseRequested(int index)
 {
     auto widget = m_ui->tabView->widget(index);
@@ -206,10 +223,9 @@ void MainWindow::on_tabCloseRequested(int index)
 
     m_ui->tabView->removeTab(index);
 
-    qDebug() << m_ui->tabView->count();
-    if(m_ui->tabView->count() == 0) {
-        m_ui->actionExit->trigger();
-    }
+//    if(m_ui->tabView->count() == 0) {
+//        m_ui->actionExit->trigger();
+//    }
 }
 
 //void MainWindow::on_actionFitView_toggled(bool enabled) const
