@@ -18,6 +18,9 @@ public:
     ~Tab();
 
     bool loadFile(const QFileInfo& file);
+
+    void tryGraphicUpdate();
+
     void swapContentPositions(bool restoreSize = true);
     bool isDefaultPositioned() const;
 

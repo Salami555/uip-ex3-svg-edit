@@ -22,6 +22,8 @@ Tab::Tab(QWidget * parent) : QSplitter(parent)
     // default: left source, right graphic
     this->addWidget(m_sourceView);
     this->addWidget(m_graphicView);
+
+    connect(m_sourceView, &SourceView::sourceChanged, this, &Tab::tryGraphicUpdate);
 }
 
 Tab::~Tab()
@@ -38,6 +40,14 @@ bool Tab::loadFile(const QFileInfo& file)
     } else {
         QMessageBox::critical(this, "File opening failed", "Error code: " + Resource::operationResultString(result));
         return false;
+    }
+}
+
+void Tab::tryGraphicUpdate()
+{
+    auto result = m_resource->setSource(m_sourceView->source());
+    if(result == ResourceOperationResult::Success) {
+        m_graphicView->reloadFromResource();
     }
 }
 
