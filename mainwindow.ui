@@ -94,7 +94,7 @@
 &lt;h1&gt;Welcome to SVG-Edit&lt;/h1&gt;
 &lt;p&gt;Edit your SVG files with pain and seizures.&lt;/p&gt;
 &lt;hr/&gt;
-&lt;p&gt;Drop your files here to load them!&lt;/p&gt;
+&lt;p&gt;Use the file menu to open your SVG files&lt;br/&gt;or drop them into the application window to load them!&lt;/p&gt;
 &lt;/body&gt;
 &lt;/html&gt;</string>
           </property>
@@ -217,7 +217,7 @@
   </action>
   <action name="actionNewFile">
    <property name="enabled">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="text">
     <string>&amp;New</string>
@@ -241,6 +241,9 @@
    </property>
   </action>
   <action name="actionSaveCurrentFile">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>&amp;Save</string>
    </property>
@@ -266,6 +269,9 @@
    </property>
   </action>
   <action name="actionSaveAllFiles">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Sav&amp;e All</string>
    </property>
@@ -277,9 +283,6 @@
    </property>
   </action>
   <action name="actionCloseCurrentFile">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
    <property name="text">
     <string>&amp;Close</string>
    </property>
@@ -302,6 +305,9 @@
    </property>
   </action>
   <action name="actionUndo">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>&amp;Undo</string>
    </property>
@@ -327,6 +333,9 @@
    </property>
   </action>
   <action name="actionCut">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Cu&amp;t</string>
    </property>
@@ -338,6 +347,9 @@
    </property>
   </action>
   <action name="actionCopy">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>&amp;Copy</string>
    </property>
@@ -349,6 +361,9 @@
    </property>
   </action>
   <action name="actionPaste">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>&amp;Paste</string>
    </property>
@@ -360,6 +375,9 @@
    </property>
   </action>
   <action name="actionSelectAll">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Select &amp;All</string>
    </property>
@@ -371,6 +389,9 @@
    </property>
   </action>
   <action name="actionFind">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>&amp;Find</string>
    </property>
@@ -382,6 +403,9 @@
    </property>
   </action>
   <action name="actionReplace">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>R&amp;eplace</string>
    </property>
@@ -393,6 +417,9 @@
    </property>
   </action>
   <action name="actionGoto">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>&amp;Go to Line</string>
    </property>
@@ -404,6 +431,9 @@
    </property>
   </action>
   <action name="actionZoomIn">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Zoom &amp;In</string>
    </property>
@@ -415,6 +445,9 @@
    </property>
   </action>
   <action name="actionZoomOut">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Zoom &amp;Out</string>
    </property>
@@ -426,6 +459,9 @@
    </property>
   </action>
   <action name="actionZoomFitSize">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>&amp;Fit Size</string>
    </property>
@@ -437,6 +473,9 @@
    </property>
   </action>
   <action name="actionChangeFontSize">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>&amp;Font Size</string>
    </property>
@@ -447,6 +486,9 @@
   <action name="actionToggleLineWrap">
    <property name="checkable">
     <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
    </property>
    <property name="text">
     <string>Line &amp;Wrap</string>
@@ -459,6 +501,9 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Syntax &amp;Highlighting</string>
    </property>
@@ -467,6 +512,9 @@
    </property>
   </action>
   <action name="actionGraphicViewToLeftSide">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>To &amp;Left Side</string>
    </property>
@@ -475,6 +523,9 @@
    </property>
   </action>
   <action name="actionGraphicViewToRightSide">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>To &amp;Right Side</string>
    </property>
@@ -483,6 +534,9 @@
    </property>
   </action>
   <action name="actionSourceViewToLeftSide">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>To &amp;Left Side</string>
    </property>
@@ -491,6 +545,9 @@
    </property>
   </action>
   <action name="actionSourceViewToRightSide">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>To &amp;Right Side</string>
    </property>
