@@ -27,9 +27,17 @@ Tab::~Tab()
 {
 }
 
-void Tab::loadFile(const QFileInfo& file)
+bool Tab::loadFile(const QFileInfo& file)
 {
-    auto opResult = m_resource->load(file.absoluteFilePath());
+    auto result = m_resource->load(file.absoluteFilePath());
+    if(result == ResourceOperationResult::Success) {
+        m_sourceView->setResource(m_resource);
+        m_graphicView->setResource(m_resource);
+        return true;
+    } else {
+        QMessageBox::critical(this, "File opening failed", "Error code: " + Resource::operationResultString(result));
+        return false;
+    }
 }
 
 GraphicsView * Tab::graphicsView() const

@@ -212,8 +212,9 @@ void MainWindow::openFiles(const QList<QFileInfo> files)
         }
 
         auto newTab = new Tab(m_ui->tabView);
-        newTab->loadFile(file);
-        m_ui->tabView->addTab(newTab, file.baseName());
+        if(newTab->loadFile(file)) {
+            m_ui->tabView->addTab(newTab, file.baseName());
+        }
     }
 }
 

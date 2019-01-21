@@ -17,7 +17,7 @@ public:
     explicit Tab(QWidget * parent = nullptr);
     ~Tab();
 
-    void loadFile(const QFileInfo& file);
+    bool loadFile(const QFileInfo& file);
 
     GraphicsView * graphicsView() const;
     SourceView * sourceView() const;
