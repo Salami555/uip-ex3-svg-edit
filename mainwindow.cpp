@@ -51,7 +51,8 @@ bool confirmDiscardingUnsavedChanges(QWidget *parent)
         parent,
         "Unsaved files",
         "Do you want to discard the current changes?",
-        QMessageBox::Yes|QMessageBox::No
+        QMessageBox::Yes|QMessageBox::No,
+        QMessageBox::No
     );
     return reply == QMessageBox::Yes;
 }
@@ -183,6 +184,8 @@ bool isFileOpened(const QTabWidget * tabs, QFileInfo &file)
 
 void MainWindow::openFiles(const QList<QFileInfo> files)
 {
+    int newTabIndex = m_ui->tabView->count();
+    bool tabAdded = false;
     for(auto file : files) {
         if(isFileOpened(m_ui->tabView, file)) {
             continue;
@@ -191,7 +194,11 @@ void MainWindow::openFiles(const QList<QFileInfo> files)
         auto newTab = new Tab(m_ui->tabView);
         if(newTab->loadFile(file)) {
             m_ui->tabView->addTab(newTab, file.baseName());
+            tabAdded = true;
         }
+    }
+    if(tabAdded) {
+        m_ui->tabView->setCurrentIndex(newTabIndex);
     }
 }
 
@@ -317,26 +324,6 @@ void MainWindow::on_tabCloseRequested(int index)
 //    m_ui->actionFitView->blockSignals(true);
 //    m_ui->actionFitView->setChecked(enabled);
 //    m_ui->actionFitView->blockSignals(false);
-//}
-
-//void MainWindow::on_sourceView_highlightChanged(bool enabled) const
-//{
-//    m_ui->actionSyntaxHighlighting->blockSignals(true);
-//    m_ui->actionSyntaxHighlighting->setChecked(enabled);
-//    m_ui->actionSyntaxHighlighting->blockSignals(false);
-//}
-
-//void MainWindow::on_sourceView_wordWrapChanged(bool enabled) const
-//{
-//    m_ui->actionWordWrap->blockSignals(true);
-//    m_ui->actionWordWrap->setChecked(enabled);
-//    m_ui->actionWordWrap->blockSignals(false);
-//}
-
-//void MainWindow::on_sourceView_sourceChanged() const
-//{
-    //    const auto source = m_ui->sourceView->source();
-    //    m_controller->modifyResource(source);
 //}
 
 //void MainWindow::on_actionZoomIn_triggered()
