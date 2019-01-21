@@ -60,7 +60,7 @@ void MainWindow::updateWindowTitle()
 {
     auto widget = m_ui->tabView->currentWidget();
     if(instanceof<Tab>(widget)) {
-        this->setWindowTitle(dynamic_cast<Tab*>(widget)->name());
+        this->setWindowTitle(dynamic_cast<Tab*>(widget)->name(true));
     }
 }
 

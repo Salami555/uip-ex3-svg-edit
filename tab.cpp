@@ -93,9 +93,12 @@ bool Tab::isDefaultPositioned() const
     return m_defaultPositioned;
 }
 
-QString Tab::name(bool windowTitleReady) const
+QString Tab::name(bool withExtension, bool windowTitleReady) const
 {
-    QString name(m_resource->file().baseName());
+    QString name(withExtension
+        ? m_resource->file().fileName()
+        : m_resource->file().baseName()
+    );
     if(windowTitleReady) {
         name += "[*]";
     } else if(m_resource->isUnsaved()) {

@@ -26,7 +26,7 @@ public:
     void swapContentPositions(bool restoreSize = true);
     bool isDefaultPositioned() const;
 
-    QString name(bool windowTitleReady = false) const;
+    QString name(bool withExtension = false, bool windowTitleReady = false) const;
 
     GraphicsView * graphicsView() const;
     SourceView * sourceView() const;
