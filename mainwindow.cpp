@@ -38,42 +38,7 @@ MainWindow::MainWindow(QWidget * parent) :
 }
 
 
-// ----- Utils -----------------------------------------------
-template<typename Base, typename T>
-inline bool instanceof(const T *ptr) {
-    return dynamic_cast<const Base*>(ptr) != nullptr;
-}
-
-bool confirmDiscardingUnsavedChanges(QWidget *parent)
-{
-    auto reply = QMessageBox::question(
-        parent,
-        "Unsaved files",
-        "Do you want to discard the current changes?",
-        QMessageBox::Yes|QMessageBox::No,
-        QMessageBox::No
-    );
-    return reply == QMessageBox::Yes;
-}
-
-void MainWindow::updateWindowTitle()
-{
-    auto widget = m_ui->tabView->currentWidget();
-    if(instanceof<Tab>(widget)) {
-        this->setWindowTitle(dynamic_cast<Tab*>(widget)->name(true));
-    }
-}
-
-void updateTabName(QTabWidget * tabView, const Tab * tab)
-{
-    // too lazy for good implementation
-    for(int i = 0; i < tabView->count(); ++i) {
-        if(tab == tabView->widget(i)) {
-            tabView->setTabText(i, tab->name());
-        }
-    }
-}
-
+// ----- File/IO -----------------------------------------------
 const QMimeDatabase db;
 bool isSVGFile(const QFileInfo & file)
 {
@@ -192,6 +157,7 @@ void MainWindow::updateRecentFileMenuList(const QList<QFileInfo> & files)
 
 void MainWindow::addRecentFile(const QFileInfo & file)
 {
+    if(!file.exists()) return;
     auto filename = file.absoluteFilePath();
     auto filenames = m_settings->value(SETTING_RECENT_FILES).toStringList();
     int index = filenames.indexOf(filename);
@@ -226,6 +192,95 @@ QString lastDirectorySavePath(const QSettings * settings)
         SETTING_LAST_SAVE_PATH,
         lastDirectoryOpenPath(settings)
     ).toString();
+}
+
+
+// ----- Utils -----------------------------------------------
+template<typename Base, typename T>
+inline bool instanceof(const T *ptr) {
+    return dynamic_cast<const Base*>(ptr) != nullptr;
+}
+
+bool confirmDiscardingUnsavedChanges(QWidget *parent)
+{
+    auto reply = QMessageBox::question(
+        parent,
+        "Unsaved files",
+        "Do you want to discard the current changes?",
+        QMessageBox::Yes|QMessageBox::No,
+        QMessageBox::No
+    );
+    return reply == QMessageBox::Yes;
+}
+
+void MainWindow::updateWindowTitle()
+{
+    auto widget = m_ui->tabView->currentWidget();
+    if(instanceof<Tab>(widget)) {
+        this->setWindowTitle(dynamic_cast<Tab*>(widget)->name(true));
+    }
+}
+
+void updateTabName(QTabWidget * tabView, const Tab * tab)
+{
+    // too lazy for good implementation
+    for(int i = 0; i < tabView->count(); ++i) {
+        if(tab == tabView->widget(i)) {
+            tabView->setTabText(i, tab->name());
+        }
+    }
+}
+
+int indexOfTabForFile(const QTabWidget * tabs, QFileInfo &file)
+{
+    for(int i = 0; i < tabs->count(); ++i) {
+        auto widget = tabs->widget(i);
+        if(instanceof<Tab>(widget)) {
+            const Tab *tab = dynamic_cast<const Tab*>(widget);
+            const Resource *res = tab->resource();
+            if(!res->hasFile()) {
+                continue;
+            }
+            if(res->file() == file) {
+                return i;
+            }
+        }
+    }
+    return -1;
+}
+
+void MainWindow::addTab(Tab * tab)
+{
+    setFontIfExists(m_settings, tab->sourceView());
+    m_ui->tabView->addTab(tab, tab->name());
+    m_ui->tabView->setCurrentIndex(m_ui->tabView->count() - 1);
+    m_ui->actionSaveCurrentFile->setDisabled(true);
+    connect(tab->resource(), &Resource::changed, this, &MainWindow::on_modifiedStatusChange);
+    connect(tab->sourceView(), &SourceView::undoAvailable, m_ui->actionUndo, &QAction::setEnabled);
+    connect(tab->sourceView(), &SourceView::redoAvailable, m_ui->actionRedo, &QAction::setEnabled);
+    this->addRecentFile(tab->resource()->file());
+}
+
+void MainWindow::openFiles(const QList<QFileInfo> files)
+{
+    int newTabIndex = m_ui->tabView->count();
+    bool tabAdded = false;
+    for(auto file : files) {
+        int index = indexOfTabForFile(m_ui->tabView, file);
+        if(index > -1) {
+            m_ui->tabView->setCurrentIndex(index);
+            continue;
+        }
+
+        auto newTab = new Tab(m_ui->tabView);
+        if(newTab->loadFile(file)) {
+            this->addTab(newTab);
+            tabAdded = true;
+        }
+    }
+    if(tabAdded) {
+        m_ui->tabView->setCurrentIndex(newTabIndex);
+    }
 }
 
 
@@ -303,6 +358,15 @@ void MainWindow::closeEvent(QCloseEvent * event)
 
 
 // ----- SLOTS -----------------------------------------------
+void MainWindow::on_actionNewFile_triggered()
+{
+    auto newTab = new Tab(m_ui->tabView);
+    newTab->loadEmptyTemplate();
+    this->addTab(newTab);
+    m_ui->actionSaveCurrentFile->setEnabled(true);
+    m_ui->actionSaveAllFiles->setEnabled(true);
+}
+
 void MainWindow::on_actionOpenFiles_triggered()
 {
     auto dialog = new QFileDialog(this);
@@ -322,64 +386,18 @@ void MainWindow::on_actionOpenFiles_triggered()
     }
 }
 
-int indexOfTabForFile(const QTabWidget * tabs, QFileInfo &file)
-{
-    for(int i = 0; i < tabs->count(); ++i) {
-        auto widget = tabs->widget(i);
-        if(instanceof<Tab>(widget)) {
-            const Tab *tab = dynamic_cast<const Tab*>(widget);
-            const Resource *res = tab->resource();
-            if(!res->hasFile()) {
-                continue;
-            }
-            if(res->file() == file) {
-                return i;
-            }
-        }
-    }
-    return -1;
-}
-
-void MainWindow::addTab(Tab * tab)
-{
-    setFontIfExists(m_settings, tab->sourceView());
-    m_ui->tabView->addTab(tab, tab->name());
-    m_ui->actionSaveCurrentFile->setDisabled(true);
-    connect(tab->resource(), &Resource::changed, this, &MainWindow::on_modifiedStatusChange);
-    connect(tab->sourceView(), &SourceView::undoAvailable, m_ui->actionUndo, &QAction::setEnabled);
-    connect(tab->sourceView(), &SourceView::redoAvailable, m_ui->actionRedo, &QAction::setEnabled);
-    this->addRecentFile(tab->resource()->file());
-}
-
-void MainWindow::openFiles(const QList<QFileInfo> files)
-{
-    int newTabIndex = m_ui->tabView->count();
-    bool tabAdded = false;
-    for(auto file : files) {
-        int index = indexOfTabForFile(m_ui->tabView, file);
-        if(index > -1) {
-            m_ui->tabView->setCurrentIndex(index);
-            continue;
-        }
-
-        auto newTab = new Tab(m_ui->tabView);
-        if(newTab->loadFile(file)) {
-            this->addTab(newTab);
-            tabAdded = true;
-        }
-    }
-    if(tabAdded) {
-        m_ui->tabView->setCurrentIndex(newTabIndex);
-    }
-}
-
 void MainWindow::on_actionSaveCurrentFile_triggered()
 {
     auto widget = m_ui->tabView->currentWidget();
     if(instanceof<Tab>(widget)) {
         Tab *tab = dynamic_cast<Tab*>(widget);
-        if(tab->saveFile()) {
-            this->on_modifiedStatusChange();
+        if(tab->resource()->hasFile()) {
+            if(tab->saveFile()) {
+                this->on_modifiedStatusChange();
+                this->addRecentFile(tab->resource()->file());
+            }
+        } else {
+            this->on_actionSaveCurrentFileAs_triggered();
         }
     }
 }
@@ -406,6 +424,7 @@ void MainWindow::on_actionSaveCurrentFileAs_triggered()
             QFileInfo file(dialog->selectedFiles().first());
             if(tab->saveFileAs(file)) {
                 this->on_modifiedStatusChange();
+                this->addRecentFile(tab->resource()->file());
             }
         }
     }
@@ -418,8 +437,13 @@ void MainWindow::on_actionSaveAllFiles_triggered()
         if(instanceof<Tab>(widget)) {
             Tab *tab = dynamic_cast<Tab*>(widget);
             if(tab->resource()->isUnsaved()) {
-                if(tab->saveFile()) {
-                    updateTabName(m_ui->tabView, tab);
+                if(tab->resource()->hasFile()) {
+                    if(tab->saveFile()) {
+                        updateTabName(m_ui->tabView, tab);
+                    }
+                } else {
+                    m_ui->tabView->setCurrentIndex(i);
+                    this->on_actionSaveCurrentFileAs_triggered();
                 }
             }
         }

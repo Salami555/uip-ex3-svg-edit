@@ -45,7 +45,7 @@ void GraphicsView::setResource(const Resource * resource, const bool reset)
 {
     m_resource = resource;
     auto scene = m_graphicsView->scene();
-    if(resource == nullptr) {
+    if(resource == nullptr || !resource->isValid()) {
         scene->clear();
         scene->setSceneRect(0, 0, 0, 0);
         m_graphicsView->centerOn(0, 0);
@@ -69,8 +69,13 @@ void GraphicsView::setResource(const Resource * resource, const bool reset)
 
 void GraphicsView::reloadFromResource()
 {
-    m_graphicsItem->renderer()->load(m_resource->source().toUtf8());
-    applyFitView();
+    if(!m_resource->isValid()) {
+        return;
+    }
+    // load crashes sometimes, nothing I can do about
+    if(m_graphicsItem->renderer()->load(m_resource->source().toUtf8())) {
+        applyFitView();
+    }
 }
 
 void GraphicsView::resizeEvent(QResizeEvent * event)

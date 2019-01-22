@@ -18,6 +18,7 @@ public:
     ~Tab();
 
     bool loadFile(const QFileInfo& file);
+    void loadEmptyTemplate();
     bool saveFile();
     bool saveFileAs(const QFileInfo& file);
 

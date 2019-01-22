@@ -33,18 +33,27 @@ Tab::~Tab()
 bool Tab::loadFile(const QFileInfo& file)
 {
     auto result = m_resource->load(file.absoluteFilePath());
-    if(result == ResourceOperationResult::Success) {
-        m_sourceView->setResource(m_resource);
-        m_graphicView->setResource(m_resource);
-        return true;
-    } else {
+    m_sourceView->setResource(m_resource);
+    m_graphicView->setResource(m_resource);
+    if(result != ResourceOperationResult::Success) {
         QMessageBox::critical(
-            this, "File opening failed",
-            "Error code: " + Resource::operationResultString(result)
+            this, "File reading failed",
+            "An error occured while reading the file.\nError code: "
+                + Resource::operationResultString(result)
                 + "\nwith: " + m_resource->file().fileName()
         );
-        return false;
     }
+    return true;
+}
+
+void Tab::loadEmptyTemplate()
+{
+    auto result = m_resource->load(QFileInfo(":/picasso-dog"), false);
+    assert(result == ResourceOperationResult::Success);
+    m_sourceView->setResource(m_resource);
+    m_graphicView->setResource(m_resource);
+    m_resource->setDirty(true);
+    this->sourceChanged();
 }
 
 bool Tab::saveFile()
@@ -56,7 +65,8 @@ bool Tab::saveFile()
     } else {
         QMessageBox::critical(
             this, "File saving failed",
-            "Error code: " + Resource::operationResultString(result)
+            "An error occured while saving the file.\nError code: "
+                + Resource::operationResultString(result)
                 + "\nwith: " + m_resource->file().fileName()
         );
         return false;
@@ -111,10 +121,11 @@ bool Tab::isDefaultPositioned() const
 
 QString Tab::name(bool withExtension, bool windowTitleReady) const
 {
-    QString name(withExtension
-        ? m_resource->file().fileName()
-        : m_resource->file().baseName()
-    );
+    QString name = m_resource->hasFile()
+        ? (withExtension
+            ? m_resource->file().fileName()
+            : m_resource->file().baseName())
+        : "Unnamed file";
     if(windowTitleReady) {
         name += "[*]";
     } else if(m_resource->isUnsaved()) {

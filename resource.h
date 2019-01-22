@@ -40,7 +40,7 @@ public:
 public:
     explicit Resource();
 
-    ResourceOperationResult load(const QFileInfo & file);
+    ResourceOperationResult load(const QFileInfo & file, bool setFile = true);
     ResourceOperationResult save();
     ResourceOperationResult save(const QFileInfo & file);
 
@@ -52,10 +52,12 @@ public:
     bool hasFile() const;
     QFileInfo file() const;
 
+    bool isValid() const;
     bool isUnsaved() const;
+    void setDirty(bool unsaved);
 
 protected:
-    bool validate() const;
+    bool validate();
 
 signals:
     void changed();
@@ -65,6 +67,7 @@ public slots:
 
 protected:
     QFileInfo m_fileInfo;
+    bool m_valid = false;
     bool m_modified = false;
 
     QScopedPointer<QXmlInputSource> m_xmlSource;

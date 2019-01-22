@@ -31,16 +31,21 @@ Resource::Resource():
 {
 }
 
-bool Resource::validate() const
+bool Resource::validate()
 {
     m_xmlSource->reset();
 
     QXmlSimpleReader xmlReader;
-    return xmlReader.parse(m_xmlSource.get());
+    m_valid = xmlReader.parse(m_xmlSource.get());
+    return m_valid;
 }
 
-ResourceOperationResult Resource::load(const QFileInfo & file)
+ResourceOperationResult Resource::load(const QFileInfo & file, bool setFile)
 {
+    if(setFile) {
+        m_fileInfo = file;
+    }
+
     if(!file.exists() || !file.isFile()) {
         return ResourceOperationResult::FileNotFound;
     }
@@ -59,7 +64,6 @@ ResourceOperationResult Resource::load(const QFileInfo & file)
     }
     m_modified = false;
 
-    m_fileInfo = file;
     return ResourceOperationResult::Success;
 }
 
@@ -135,7 +139,17 @@ QFileInfo Resource::file() const
     return m_fileInfo;
 }
 
+bool Resource::isValid() const
+{
+    return m_valid;
+}
+
 bool Resource::isUnsaved() const
 {
-    return m_modified;
+    return !this->hasFile() || m_modified;
+}
+
+void Resource::setDirty(bool unsaved)
+{
+    m_modified = unsaved;
 }

@@ -40,6 +40,7 @@ protected:
 
 private slots:
     // menu trigger
+    void on_actionNewFile_triggered();
     void on_actionOpenFiles_triggered();
     void on_actionSaveCurrentFile_triggered();
     void on_actionSaveCurrentFileAs_triggered();

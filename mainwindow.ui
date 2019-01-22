@@ -172,9 +172,6 @@
    </property>
   </action>
   <action name="actionNewFile">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="text">
     <string>&amp;New</string>
    </property>
