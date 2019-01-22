@@ -26,8 +26,11 @@ protected:
     void restoreRecentFileList();
     void updateRecentFileMenuList(const QList<QFileInfo> & files);
     void updateWindowTitle();
+    int indexOfTabForFile(QFileInfo &file);
     void addTab(Tab * tab);
     void openFiles(const QList<QFileInfo> files);
+    void saveSession();
+    void tryRestoreSession();
 
     void toggleAllSplitterPositionModifiers();
     void swapCurrentTabSplitterContent();

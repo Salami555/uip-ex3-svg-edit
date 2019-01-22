@@ -39,6 +39,11 @@ MainWindow::MainWindow(QWidget * parent) :
 
 
 // ----- File/IO -----------------------------------------------
+template<typename Base, typename T>
+inline bool instanceof(const T *ptr) {
+    return dynamic_cast<const Base*>(ptr) != nullptr;
+}
+
 const QMimeDatabase db;
 bool isSVGFile(const QFileInfo & file)
 {
@@ -116,6 +121,8 @@ QList<QFileInfo> preprocessFileList(const QList<QFileInfo> & files)
 // --- State / Settings -----------------------------------------------
 const short SETTING_MAX_RECENT_FILES_COUNT = 10;
 const QString SETTING_RECENT_FILES = "last_state/used_files";
+const QString SETTING_LAST_SESSION = "last_state/session";
+const QString SETTING_LAST_SESSION_FOCUS = "last_state/session/focus";
 const QString SETTING_LAST_OPEN_PATH = "last_state/directories/open";
 const QString SETTING_LAST_SAVE_PATH = "last_state/directories/save";
 const QString SETTING_STYLE_DEFAULT_FONT = "style/default_font";
@@ -174,8 +181,41 @@ void MainWindow::addRecentFile(const QFileInfo & file)
 
 void MainWindow::restoreRecentFileList()
 {
-    auto filenames = m_settings->value(SETTING_RECENT_FILES).toStringList();
+    auto filenames = m_settings->value(SETTING_RECENT_FILES, {}).toStringList();
     this->updateRecentFileMenuList(names2fileinfos(filenames));
+}
+
+void MainWindow::saveSession()
+{
+    QStringList filenames;
+    for(int i = 0; i < m_ui->tabView->count(); ++i) {
+        auto widget = m_ui->tabView->widget(i);
+        if(instanceof<Tab>(widget)) {
+            const Tab *tab = dynamic_cast<const Tab*>(widget);
+            if(tab->resource()->hasFile()) {
+                QString filePath = tab->resource()->file().absoluteFilePath();
+                filenames.append(filePath);
+                if(m_ui->tabView->currentIndex() == i) {
+                    m_settings->setValue(SETTING_LAST_SESSION_FOCUS, filePath);
+                }
+            }
+        }
+    }
+    m_settings->setValue(SETTING_LAST_SESSION, filenames);
+    m_settings->sync();
+}
+
+void MainWindow::tryRestoreSession()
+{
+    auto filenames = m_settings->value(SETTING_LAST_SESSION, {}).toStringList();
+    this->openFiles(names2fileinfos(filenames));
+    if(m_settings->contains(SETTING_LAST_SESSION_FOCUS)) {
+        QFileInfo file(m_settings->value(SETTING_LAST_SESSION_FOCUS).toString());
+        int index = this->indexOfTabForFile(file);
+        if(index > -1) {
+            m_ui->tabView->setCurrentIndex(index);
+        }
+    }
 }
 
 QString lastDirectoryOpenPath(const QSettings * settings)
@@ -196,11 +236,6 @@ QString lastDirectorySavePath(const QSettings * settings)
 
 
 // ----- Utils -----------------------------------------------
-template<typename Base, typename T>
-inline bool instanceof(const T *ptr) {
-    return dynamic_cast<const Base*>(ptr) != nullptr;
-}
-
 bool confirmDiscardingUnsavedChanges(QWidget *parent)
 {
     auto reply = QMessageBox::question(
@@ -231,10 +266,10 @@ void updateTabName(QTabWidget * tabView, const Tab * tab)
     }
 }
 
-int indexOfTabForFile(const QTabWidget * tabs, QFileInfo &file)
+int MainWindow::indexOfTabForFile(QFileInfo &file)
 {
-    for(int i = 0; i < tabs->count(); ++i) {
-        auto widget = tabs->widget(i);
+    for(int i = 0; i < m_ui->tabView->count(); ++i) {
+        auto widget = m_ui->tabView->widget(i);
         if(instanceof<Tab>(widget)) {
             const Tab *tab = dynamic_cast<const Tab*>(widget);
             const Resource *res = tab->resource();
@@ -266,7 +301,7 @@ void MainWindow::openFiles(const QList<QFileInfo> files)
     int newTabIndex = m_ui->tabView->count();
     bool tabAdded = false;
     for(auto file : files) {
-        int index = indexOfTabForFile(m_ui->tabView, file);
+        int index = this->indexOfTabForFile(file);
         if(index > -1) {
             m_ui->tabView->setCurrentIndex(index);
             continue;
@@ -327,8 +362,12 @@ void MainWindow::showEvent(QShowEvent * event)
 
     QStringList args(qApp->arguments());
     args.removeFirst();
-    auto files = preprocessFileList(names2fileinfos(args));
-    this->openFiles(files);
+    if(args.isEmpty()) {
+        this->tryRestoreSession();
+    } else {
+        auto files = preprocessFileList(names2fileinfos(args));
+        this->openFiles(files);
+    }
 }
 
 bool isEveryFileSaved(const QTabWidget * tabView)
@@ -353,6 +392,7 @@ void MainWindow::closeEvent(QCloseEvent * event)
             return;
         }
     }
+    this->saveSession();
     qApp->exit();
 }
 
@@ -479,11 +519,13 @@ void MainWindow::on_actionCloseAllFiles_triggered()
 
 void MainWindow::on_actionExit_triggered()
 {
+    // TODO: remove code dupe
     if(!isEveryFileSaved(m_ui->tabView)) {
         if(!confirmDiscardingUnsavedChanges(this)) {
             return;
         }
     }
+    this->saveSession();
     qApp->exit();
 }
 
