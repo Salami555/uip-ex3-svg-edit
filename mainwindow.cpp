@@ -543,10 +543,16 @@ void MainWindow::on_tabSelected()
         m_ui->actionSetLineWrap->disconnect(SIGNAL(triggered()));
         m_ui->actionSetLineWrap->setChecked(tab->sourceView()->hasWordWrap());
         connect(m_ui->actionSetLineWrap, &QAction::triggered, tab->sourceView(), &SourceView::setWordWrap);
-
         m_ui->actionSetSyntaxHighlighting->disconnect(SIGNAL(triggered()));
         m_ui->actionSetSyntaxHighlighting->setChecked(tab->sourceView()->hasHighlighting());
         connect(m_ui->actionSetSyntaxHighlighting, &QAction::triggered, tab->sourceView(), &SourceView::setHighlighting);
+
+        m_ui->actionZoomIn->disconnect(SIGNAL(triggered()));
+        m_ui->actionZoomOut->disconnect(SIGNAL(triggered()));
+        m_ui->actionZoomFitSize->disconnect(SIGNAL(triggered()));
+        connect(m_ui->actionZoomIn, &QAction::triggered, tab->graphicsView(), &GraphicsView::zoomIn);
+        connect(m_ui->actionZoomOut, &QAction::triggered, tab->graphicsView(), &GraphicsView::zoomOut);
+        connect(m_ui->actionZoomFitSize, &QAction::triggered, tab->graphicsView(), &GraphicsView::setFitView);
 
         m_ui->actionUndo->disconnect(SIGNAL(triggered()));
         m_ui->actionRedo->disconnect(SIGNAL(triggered()));

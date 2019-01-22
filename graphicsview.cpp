@@ -101,26 +101,50 @@ bool GraphicsView::eventFilter(QObject * obj, QEvent * event)
 }
 
 
+bool GraphicsView::shouldFitView() const
+{
+    return qIsInf(m_zoom);
+}
+
 void GraphicsView::setFitView(bool enabled)
 {
-    if(m_fitView == enabled) {
+    if(this->shouldFitView() == enabled) {
         return;
     }
-    m_fitView = enabled;
-    emit fitViewChanged(enabled);
+    if(enabled) {
+        m_zoom = qInf();
+        emit fitViewChanged(enabled);
 
-    applyFitView();
+        applyFitView();
+    } else {
+        this->setZoom(1);
+    }
+}
+
+qreal GraphicsView::zoom() const
+{
+    return m_zoom;
 }
 
 void GraphicsView::setZoom(qreal zoom)
 {
-    setFitView(false);
+    m_zoom = zoom;
     m_graphicsView->scale(zoom, zoom);
+}
+
+void GraphicsView::zoomIn()
+{
+    this->setZoom(this->zoom() * 1.1);
+}
+
+void GraphicsView::zoomOut()
+{
+    this->setZoom(this->zoom() * 0.9);
 }
 
 void GraphicsView::applyFitView() const
 {
-    if(m_fitView == false || m_graphicsView->scene() == nullptr) {
+    if(!this->shouldFitView() || m_graphicsView->scene() == nullptr) {
         return;
     }
     m_graphicsView->fitInView(m_graphicsView->sceneRect(), Qt::KeepAspectRatio);

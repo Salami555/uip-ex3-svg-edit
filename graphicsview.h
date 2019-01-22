@@ -18,8 +18,12 @@ class GraphicsView : public QWidget
 public:
     explicit GraphicsView(QWidget * parent = nullptr);
 
-    void setFitView(bool enabled);
+    bool shouldFitView() const;
+    qreal zoom() const;
+    void zoomIn();
+    void zoomOut();
     void setZoom(qreal zoom);
+    void setFitView(bool enabled);
 
 protected:
     void resizeEvent(QResizeEvent * event) override;
@@ -48,5 +52,5 @@ protected:
 
     QLabel * m_statusLabel = nullptr;
 
-    bool m_fitView = false;
+    qreal m_zoom = 1;
 };

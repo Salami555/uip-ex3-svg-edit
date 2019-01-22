@@ -357,9 +357,6 @@
    </property>
   </action>
   <action name="actionZoomIn">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="text">
     <string>Zoom &amp;In</string>
    </property>
@@ -367,13 +364,10 @@
     <string>Zoom into the image</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+]</string>
+    <string>Ctrl++</string>
    </property>
   </action>
   <action name="actionZoomOut">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="text">
     <string>Zoom &amp;Out</string>
    </property>
@@ -385,9 +379,6 @@
    </property>
   </action>
   <action name="actionZoomFitSize">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="text">
     <string>&amp;Fit Size</string>
    </property>
