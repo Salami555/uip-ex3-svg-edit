@@ -19,7 +19,6 @@ public:
     explicit GraphicsView(QWidget * parent = nullptr);
 
     bool shouldFitView() const;
-    qreal zoom() const;
     void zoomIn();
     void zoomOut();
     void setZoom(qreal zoom);
@@ -40,8 +39,8 @@ signals:
 public slots:
     void setResource(const Resource * resource, bool reset = false);
     void reloadFromResource();
+    void fitView();
 
-protected slots:
     void updateStatusData(const QPoint & position) const;
 
 protected:
@@ -52,5 +51,5 @@ protected:
 
     QLabel * m_statusLabel = nullptr;
 
-    qreal m_zoom = 1;
+    bool m_fitView = true;
 };

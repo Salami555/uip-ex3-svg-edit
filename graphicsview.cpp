@@ -103,7 +103,12 @@ bool GraphicsView::eventFilter(QObject * obj, QEvent * event)
 
 bool GraphicsView::shouldFitView() const
 {
-    return qIsInf(m_zoom);
+    return m_fitView;
+}
+
+void GraphicsView::fitView()
+{
+    this->setFitView(true);
 }
 
 void GraphicsView::setFitView(bool enabled)
@@ -111,35 +116,26 @@ void GraphicsView::setFitView(bool enabled)
     if(this->shouldFitView() == enabled) {
         return;
     }
-    if(enabled) {
-        m_zoom = qInf();
-        emit fitViewChanged(enabled);
+    m_fitView = enabled;
+    emit fitViewChanged(enabled);
 
-        applyFitView();
-    } else {
-        this->setZoom(1);
-    }
-}
-
-qreal GraphicsView::zoom() const
-{
-    return m_zoom;
+    applyFitView();
 }
 
 void GraphicsView::setZoom(qreal zoom)
 {
-    m_zoom = zoom;
+    setFitView(false);
     m_graphicsView->scale(zoom, zoom);
 }
 
 void GraphicsView::zoomIn()
 {
-    this->setZoom(this->zoom() * 1.1);
+    this->setZoom(1.25);
 }
 
 void GraphicsView::zoomOut()
 {
-    this->setZoom(this->zoom() * 0.9);
+    this->setZoom(1.0 / 1.25);
 }
 
 void GraphicsView::applyFitView() const

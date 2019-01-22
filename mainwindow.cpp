@@ -594,7 +594,7 @@ void MainWindow::on_tabSelected()
         m_ui->actionZoomFitSize->disconnect(SIGNAL(triggered()));
         connect(m_ui->actionZoomIn, &QAction::triggered, tab->graphicsView(), &GraphicsView::zoomIn);
         connect(m_ui->actionZoomOut, &QAction::triggered, tab->graphicsView(), &GraphicsView::zoomOut);
-        connect(m_ui->actionZoomFitSize, &QAction::triggered, tab->graphicsView(), &GraphicsView::setFitView);
+        connect(m_ui->actionZoomFitSize, &QAction::triggered, tab->graphicsView(), &GraphicsView::fitView);
 
         m_ui->actionUndo->disconnect(SIGNAL(triggered()));
         m_ui->actionRedo->disconnect(SIGNAL(triggered()));
@@ -658,24 +658,3 @@ void MainWindow::on_modifiedStatusChange()
     m_ui->actionSaveAllFiles->setDisabled(isEveryFileSaved(m_ui->tabView));
 }
 
-//void MainWindow::on_actionFitView_toggled(bool enabled) const
-//{
-    //    m_ui->graphicsView->setFitView(enabled);
-//}
-
-//void MainWindow::on_graphicsView_fitViewChanged(bool enabled) const
-//{
-//    m_ui->actionFitView->blockSignals(true);
-//    m_ui->actionFitView->setChecked(enabled);
-//    m_ui->actionFitView->blockSignals(false);
-//}
-
-//void MainWindow::on_actionZoomIn_triggered()
-//{
-    //    m_ui->graphicsView->setZoom(1.25);
-//}
-
-//void MainWindow::on_actionZoomOut_triggered()
-//{
-    //    m_ui->graphicsView->setZoom(1.0 / 1.25);
-//}
