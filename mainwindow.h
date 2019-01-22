@@ -61,6 +61,7 @@ private slots:
     void on_tabSelected();
     void on_tabCloseRequested(int index);
     void on_modifiedStatusChange();
+    void on_tabStatusDataChange(const QString & status);
 
 private:
     Ui::MainWindow * m_ui;

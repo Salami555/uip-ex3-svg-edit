@@ -293,6 +293,8 @@ void MainWindow::addTab(Tab * tab)
     connect(tab->resource(), &Resource::changed, this, &MainWindow::on_modifiedStatusChange);
     connect(tab->sourceView(), &SourceView::undoAvailable, m_ui->actionUndo, &QAction::setEnabled);
     connect(tab->sourceView(), &SourceView::redoAvailable, m_ui->actionRedo, &QAction::setEnabled);
+    connect(tab->sourceView(), &SourceView::statusDataChanged, this, &MainWindow::on_tabStatusDataChange);
+    connect(tab->graphicsView(), &GraphicsView::statusDataChanged, this, &MainWindow::on_tabStatusDataChange);
     this->addRecentFile(tab->resource()->file());
 }
 
@@ -572,6 +574,7 @@ void MainWindow::on_actionAbout_triggered()
 
 void MainWindow::on_tabSelected()
 {
+    m_ui->statusBar->clearMessage();
     auto widget = m_ui->tabView->currentWidget();
     if(instanceof<Tab>(widget)) {
         const Tab *tab = dynamic_cast<const Tab*>(widget);
@@ -620,6 +623,7 @@ void MainWindow::on_tabSelected()
         if(m_ui->actionGraphicViewToLeftSide->isEnabled() != tab->isDefaultPositioned()) {
             this->toggleAllSplitterPositionModifiers();
         }
+        tab->sourceView()->updateStatusData();
     } else {
         m_ui->actionSaveCurrentFile->setDisabled(true);
         m_ui->actionSaveCurrentFileAs->setDisabled(true);
@@ -658,3 +662,15 @@ void MainWindow::on_modifiedStatusChange()
     m_ui->actionSaveAllFiles->setDisabled(isEveryFileSaved(m_ui->tabView));
 }
 
+void MainWindow::on_tabStatusDataChange(const QString & status)
+{
+//    if(status.isEmpty()) {
+//        auto widget = m_ui->tabView->currentWidget();
+//        if(instanceof<Tab>(widget)) {
+//            const Tab *tab = dynamic_cast<const Tab*>(widget);
+//            // very bad hack, do not try this at home kids!
+//            tab->sourceView()->updateStatusData();
+//        }
+//    }
+    m_ui->statusBar->showMessage(status);
+}

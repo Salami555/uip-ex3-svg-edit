@@ -36,6 +36,8 @@ protected:
 signals:
     void fitViewChanged(bool enabled) const;
 
+    void statusDataChanged(const QString & status) const;
+
 public slots:
     void setResource(const Resource * resource, bool reset = false);
     void reloadFromResource();
@@ -48,8 +50,6 @@ protected:
 
     QGraphicsView * m_graphicsView = nullptr;
     QGraphicsSvgItem * m_graphicsItem = nullptr;
-
-    QLabel * m_statusLabel = nullptr;
 
     bool m_fitView = true;
 };

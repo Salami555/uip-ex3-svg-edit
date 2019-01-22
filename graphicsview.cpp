@@ -34,11 +34,7 @@ GraphicsView::GraphicsView(QWidget * parent) : QWidget(parent)
     m_graphicsView->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     m_graphicsView->setRenderHints(QPainter::RenderHint::HighQualityAntialiasing | QPainter::RenderHint::Antialiasing);
 
-    m_statusLabel = new QLabel();
-    m_statusLabel->setDisabled(true); // just for the grayish look
-
     layout->addWidget(m_graphicsView);
-    layout->addWidget(m_statusLabel);
 }
 
 void GraphicsView::setResource(const Resource * resource, const bool reset)
@@ -150,7 +146,7 @@ void GraphicsView::updateStatusData(const QPoint & position) const {
 
     static const auto status = QString("x %1, y %2"); //, hex %3");
     if(this->childAt(position) != m_graphicsView->viewport()) {
-        m_statusLabel->setText(status.arg("").arg("")); //.arg(""));
+        emit statusDataChanged("");
         return;
     }
 
@@ -163,6 +159,6 @@ void GraphicsView::updateStatusData(const QPoint & position) const {
 //    const auto color = QColor(pixmap.toImage().pixel(0, 0));
     const auto statusWithData = QString(status).arg(coordinates.x()).arg(coordinates.y()); //.arg(color.name());
 
-    m_statusLabel->setText(statusWithData);
+    emit statusDataChanged(statusWithData);
 }
 

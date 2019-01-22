@@ -31,6 +31,8 @@ signals:
     void undoAvailable(bool available) const;
     void redoAvailable(bool available) const;
 
+    void statusDataChanged(const QString & status) const;
+
 public slots:
     void setResource(const Resource * resource);
 
@@ -51,12 +53,10 @@ public slots:
     void replace();
     void gotoLine();
 
-protected slots:
     void updateStatusData() const;
 
 protected:
     QTextEdit * m_textEdit = nullptr;
-    QLabel * m_statusLabel = nullptr;
     QSyntaxHighlighter * m_highlighter = nullptr;
 
     bool m_undoAvailable = false, m_redoAvailable = false;
