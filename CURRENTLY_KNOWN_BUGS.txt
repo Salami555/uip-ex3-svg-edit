@@ -1,0 +1,3 @@
+1) when naming a new file the same as existing opened ones, the application doesn't notice the doubled tabs (they are not allowed)
+2) sometimes the svg parser returns valid for invalid images, therefore the image loader crashes
+3) the behaviour of "fit zoom size" is not documented and kinda special

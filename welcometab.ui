@@ -47,7 +47,7 @@
 &lt;li&gt;open files via drag'n'drop&lt;/li&gt;
 &lt;li&gt;does not open files multiple times&lt;/li&gt;
 &lt;li&gt;fancy Win98 theme&lt;/li&gt;
-&lt;li&gt;about dialog&lt;/li&gt;
+&lt;li&gt;about dialog (not about life, the universe and everything but this software)&lt;/li&gt;
 &lt;li&gt;closable tabs and close them all at once!&lt;/li&gt;
 &lt;li&gt;opening files filters for svg files only!&lt;/li&gt;
 &lt;li&gt;remembers last open/save directory&lt;/li&gt;
@@ -63,7 +63,10 @@
 &lt;li&gt;save, save as and save all!&lt;/li&gt;
 &lt;li&gt;recently used file list&lt;/li&gt;
 &lt;li&gt;create new files (with template)!&lt;/li&gt;
-&lt;li&gt;funky zooming (sth. broken with it)&lt;/li&gt;
+&lt;li&gt;funky zooming (works most of the time)&lt;/li&gt;
+&lt;li&gt;remembers the last session (ignores it if you open new files)&lt;/li&gt;
+&lt;li&gt;the one and only status bar&lt;/li&gt;
+&lt;li&gt;the 25th something, I forgot&lt;/li&gt;
 &lt;/ol&gt;
 &lt;/body&gt;
 &lt;/html&gt;</string>
