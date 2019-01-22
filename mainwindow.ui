@@ -283,9 +283,6 @@
    </property>
   </action>
   <action name="actionCut">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="text">
     <string>Cu&amp;t</string>
    </property>
@@ -297,9 +294,6 @@
    </property>
   </action>
   <action name="actionCopy">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="text">
     <string>&amp;Copy</string>
    </property>
@@ -311,9 +305,6 @@
    </property>
   </action>
   <action name="actionPaste">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="text">
     <string>&amp;Paste</string>
    </property>
@@ -325,9 +316,6 @@
    </property>
   </action>
   <action name="actionSelectAll">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="text">
     <string>Select &amp;All</string>
    </property>
@@ -339,9 +327,6 @@
    </property>
   </action>
   <action name="actionFind">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="text">
     <string>&amp;Find</string>
    </property>
@@ -353,9 +338,6 @@
    </property>
   </action>
   <action name="actionReplace">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="text">
     <string>R&amp;eplace</string>
    </property>
@@ -367,9 +349,6 @@
    </property>
   </action>
   <action name="actionGoto">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="text">
     <string>&amp;Go to Line</string>
    </property>

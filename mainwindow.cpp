@@ -322,7 +322,7 @@ void MainWindow::on_actionOpenFiles_triggered()
     }
 }
 
-bool isFileOpened(const QTabWidget * tabs, QFileInfo &file)
+int indexOfTabForFile(const QTabWidget * tabs, QFileInfo &file)
 {
     for(int i = 0; i < tabs->count(); ++i) {
         auto widget = tabs->widget(i);
@@ -333,11 +333,11 @@ bool isFileOpened(const QTabWidget * tabs, QFileInfo &file)
                 continue;
             }
             if(res->file() == file) {
-                return true;
+                return i;
             }
         }
     }
-    return false;
+    return -1;
 }
 
 void MainWindow::addTab(Tab * tab)
@@ -346,6 +346,8 @@ void MainWindow::addTab(Tab * tab)
     m_ui->tabView->addTab(tab, tab->name());
     m_ui->actionSaveCurrentFile->setDisabled(true);
     connect(tab->resource(), &Resource::changed, this, &MainWindow::on_modifiedStatusChange);
+    connect(tab->sourceView(), &SourceView::undoAvailable, m_ui->actionUndo, &QAction::setEnabled);
+    connect(tab->sourceView(), &SourceView::redoAvailable, m_ui->actionRedo, &QAction::setEnabled);
     this->addRecentFile(tab->resource()->file());
 }
 
@@ -354,7 +356,9 @@ void MainWindow::openFiles(const QList<QFileInfo> files)
     int newTabIndex = m_ui->tabView->count();
     bool tabAdded = false;
     for(auto file : files) {
-        if(isFileOpened(m_ui->tabView, file)) {
+        int index = indexOfTabForFile(m_ui->tabView, file);
+        if(index > -1) {
+            m_ui->tabView->setCurrentIndex(index);
             continue;
         }
 
@@ -519,6 +523,27 @@ void MainWindow::on_tabSelected()
         m_ui->actionSetSyntaxHighlighting->disconnect(SIGNAL(triggered()));
         m_ui->actionSetSyntaxHighlighting->setChecked(tab->sourceView()->hasHighlighting());
         connect(m_ui->actionSetSyntaxHighlighting, &QAction::triggered, tab->sourceView(), &SourceView::setHighlighting);
+
+        m_ui->actionUndo->disconnect(SIGNAL(triggered()));
+        m_ui->actionRedo->disconnect(SIGNAL(triggered()));
+        m_ui->actionCut->disconnect(SIGNAL(triggered()));
+        m_ui->actionCopy->disconnect(SIGNAL(triggered()));
+        m_ui->actionPaste->disconnect(SIGNAL(triggered()));
+        m_ui->actionSelectAll->disconnect(SIGNAL(triggered()));
+        m_ui->actionFind->disconnect(SIGNAL(triggered()));
+        m_ui->actionReplace->disconnect(SIGNAL(triggered()));
+        m_ui->actionGoto->disconnect(SIGNAL(triggered()));
+        connect(m_ui->actionUndo, &QAction::triggered, tab->sourceView(), &SourceView::undo);
+        connect(m_ui->actionRedo, &QAction::triggered, tab->sourceView(), &SourceView::redo);
+        connect(m_ui->actionCut, &QAction::triggered, tab->sourceView(), &SourceView::cut);
+        connect(m_ui->actionCopy, &QAction::triggered, tab->sourceView(), &SourceView::copy);
+        connect(m_ui->actionPaste, &QAction::triggered, tab->sourceView(), &SourceView::paste);
+        connect(m_ui->actionSelectAll, &QAction::triggered, tab->sourceView(), &SourceView::selectAll);
+        connect(m_ui->actionFind, &QAction::triggered, tab->sourceView(), &SourceView::find);
+        connect(m_ui->actionReplace, &QAction::triggered, tab->sourceView(), &SourceView::replace);
+        connect(m_ui->actionGoto, &QAction::triggered, tab->sourceView(), &SourceView::gotoLine);
+        m_ui->actionUndo->setEnabled(tab->sourceView()->isUndoAvailable());
+        m_ui->actionRedo->setEnabled(tab->sourceView()->isRedoAvailable());
 
         if(m_ui->actionGraphicViewToLeftSide->isEnabled() != tab->isDefaultPositioned()) {
             this->toggleAllSplitterPositionModifiers();

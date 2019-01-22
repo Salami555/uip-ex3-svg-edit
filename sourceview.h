@@ -16,6 +16,9 @@ class SourceView: public QWidget
 public:
     explicit SourceView(QWidget * parent = nullptr);
 
+    bool isUndoAvailable() const;
+    bool isRedoAvailable() const;
+
     const QFont font() const;
     bool hasHighlighting() const;
     bool hasWordWrap() const;
@@ -25,6 +28,8 @@ signals:
     void highlightingChanged(bool enabled) const;
     void wordWrapChanged(bool enabled) const;
     void sourceChanged() const;
+    void undoAvailable(bool available) const;
+    void redoAvailable(bool available) const;
 
 public slots:
     void setResource(const Resource * resource);
@@ -33,7 +38,18 @@ public slots:
     void setHighlighting(bool enable);
     void setWordWrap(bool enable);
 
+    void on_undoAvailable(bool available);
+    void on_redoAvailable(bool available);
+
+    void undo();
+    void redo();
+    void cut();
+    void copy() const;
+    void paste();
     void selectAll() const;
+    void find();
+    void replace();
+    void gotoLine();
 
 protected slots:
     void updateStatusData() const;
@@ -43,4 +59,5 @@ protected:
     QLabel * m_statusLabel = nullptr;
     QSyntaxHighlighter * m_highlighter = nullptr;
 
+    bool m_undoAvailable = false, m_redoAvailable = false;
 };

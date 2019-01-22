@@ -6,6 +6,8 @@
 #include <QTextCursor>
 #include <QTextDocumentFragment>
 #include <QRegExp>
+#include <QMessageBox>
+#include <QInputDialog>
 #include <QDebug>
 
 #include "resource.h"
@@ -36,6 +38,9 @@ SourceView::SourceView(QWidget * parent) : QWidget(parent)
     connect(m_textEdit, &QTextEdit::cursorPositionChanged, this, &SourceView::updateStatusData);
     connect(m_textEdit, &QTextEdit::textChanged, this, &SourceView::updateStatusData);
     connect(m_textEdit, &QTextEdit::textChanged, this, &SourceView::sourceChanged);
+
+    connect(m_textEdit, &QTextEdit::undoAvailable, this, &SourceView::on_undoAvailable);
+    connect(m_textEdit, &QTextEdit::redoAvailable, this, &SourceView::on_redoAvailable);
 }
 
 QString SourceView::source() const
@@ -93,9 +98,141 @@ bool SourceView::hasWordWrap() const
     return m_textEdit->wordWrapMode() != QTextOption::NoWrap;
 }
 
+void SourceView::on_undoAvailable(bool available)
+{
+    m_undoAvailable = available;
+    emit undoAvailable(available);
+}
+bool SourceView::isUndoAvailable() const
+{
+    return m_undoAvailable;
+}
+
+void SourceView::on_redoAvailable(bool available)
+{
+    m_redoAvailable = available;
+    emit redoAvailable(available);
+}
+bool SourceView::isRedoAvailable() const
+{
+    return m_redoAvailable;
+}
+
+void SourceView::undo()
+{
+    m_textEdit->undo();
+}
+
+void SourceView::redo()
+{
+    m_textEdit->redo();
+}
+
+void SourceView::cut()
+{
+    m_textEdit->cut();
+}
+
+void SourceView::copy() const
+{
+    m_textEdit->copy();
+}
+
+void SourceView::paste()
+{
+    m_textEdit->paste();
+}
+
 void SourceView::selectAll() const
 {
     m_textEdit->selectAll();
+}
+
+void SourceView::find()
+{
+    QString searchText = m_textEdit->textCursor().selectedText();
+    bool aborted = false;
+    while(!aborted) {
+        searchText = QInputDialog::getText(this, "Find", "search text", QLineEdit::Normal, searchText);
+        if(!searchText.isEmpty()) {
+            auto match = m_textEdit->document()->find(searchText, m_textEdit->textCursor());
+            if(!match.isNull()) {
+                m_textEdit->setTextCursor(match);
+            } else {
+                match = m_textEdit->document()->find(searchText);
+                if(!match.isNull()) {
+                    m_textEdit->setTextCursor(match);
+                } else {
+                    aborted = true;
+                    QMessageBox::information(this, "Find", "The search text '" + searchText + "' was not found.");
+                }
+            }
+        } else {
+            aborted = true;
+        }
+    }
+}
+
+void SourceView::replace()
+{
+    QString searchText = m_textEdit->textCursor().selectedText();
+    searchText = QInputDialog::getText(this, "Replace", "search text", QLineEdit::Normal, searchText);
+    if(searchText.isEmpty()) return;
+
+    bool aborted = false, fastForward = false, restarted = false;
+    if(!m_textEdit->document()->find(searchText).isNull()) {
+        QString replaceText = QInputDialog::getText(this, "Replace", "replace text", QLineEdit::Normal, searchText);
+        if(replaceText.isEmpty()) return;
+        m_textEdit->textCursor().clearSelection();
+        while(!aborted) {
+            auto match = m_textEdit->document()->find(searchText, m_textEdit->textCursor());
+            if(!match.isNull()) {
+                m_textEdit->setTextCursor(match);
+                auto button = fastForward
+                        ? QMessageBox::Yes
+                        : QMessageBox::question(
+                            this, "Replace", "Replace this occurrence?",
+                            QMessageBox::Yes|QMessageBox::YesToAll|QMessageBox::No|QMessageBox::Abort,
+                            QMessageBox::Abort
+                        );
+                switch(button) {
+                case QMessageBox::Yes:
+                    m_textEdit->textCursor().removeSelectedText();
+                    m_textEdit->textCursor().insertText(replaceText);
+                    continue;
+                case QMessageBox::No:
+                    continue;
+                case QMessageBox::YesToAll:
+                    fastForward = true;
+                    continue;
+                default:
+                    aborted = true;
+                    continue;
+                }
+            } else {
+                if(restarted) {
+                    aborted = true;
+                }
+                m_textEdit->setTextCursor(QTextCursor());
+                restarted = true;
+            }
+        }
+    }
+    if(fastForward) {
+        QMessageBox::information(this, "Replace", "All occurrences of '" + searchText + "' replaced.");
+    } else {
+        QMessageBox::information(this, "Replace", "The search text '" + searchText + "' was not found.");
+    }
+}
+
+void SourceView::gotoLine()
+{
+    auto cursor = m_textEdit->textCursor();
+    auto document = m_textEdit->document();
+    int currentLineIndex = cursor.blockNumber();
+    int lineCount = document->blockCount();
+    int newLineIndex = QInputDialog::getInt(this, "Go to line", "line number", currentLineIndex + 1, 1, lineCount) - 1;
+    m_textEdit->setTextCursor(QTextCursor(document->findBlockByLineNumber(newLineIndex)));
 }
 
 void SourceView::updateStatusData() const
